@@ -16,3 +16,7 @@ SECRET_ACCESS_KEY=...
 VAULT_NAME=...
 
 ```
+
+## Usage
+
+python valleybackup.py backup <file>
