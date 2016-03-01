@@ -1,0 +1,10 @@
+PyYAML==3.11
+argparse==1.2.1
+boto==2.39.0
+cement==2.8.2
+flake8==2.5.4
+mccabe==0.4.0
+pep8==1.7.0
+pyflakes==1.0.0
+python-gnupg==0.3.8
+wsgiref==0.1.2
