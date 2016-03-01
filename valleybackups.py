@@ -1,6 +1,8 @@
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
-import boto
+from extensions.GlacierVault import GlacierVault
+import os
+
 
 class MyBaseController(CementBaseController):
     class Meta:
@@ -30,6 +32,11 @@ class MyBaseController(CementBaseController):
         SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
         VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
 
+        GlacierVault(VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY).upload(
+            os.path.abspath("test.txt")
+        )
+
+        """
         # boto.connect_glacier is a shortcut return a Layer2 instance
         glacier_connection = boto.connect_glacier(
                                 region_name="us-west-2",
@@ -38,10 +45,12 @@ class MyBaseController(CementBaseController):
 
         self.app.log.info("Creating Glacier Vault %s" % VAULT_NAME)
 
-        vault = glacier_connection.create_vault(VAULT_NAME)
+        vault = glacier_connection.get_vault(VAULT_NAME)
 
         self.app.log.info("Backing up file...")
-
+        archive_id = vault.upload_archive("test.tgz")
+        #import pdb; pdb.set_trace()
+        """
     @expose(aliases=['cmd2'], help="more of nothing")
     def command2(self):
         self.app.log.info("Inside MyBaseController.command2()")
