@@ -19,4 +19,4 @@ VAULT_NAME=...
 
 ## Usage
 
-python valleybackup.py backup <file>
+Run `python valleybackups.py backup <file>`
