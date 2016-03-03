@@ -1,7 +1,6 @@
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
 from extensions.GlacierVault import GlacierVault
-import os
 
 
 class MyBaseController(CementBaseController):
@@ -9,20 +8,14 @@ class MyBaseController(CementBaseController):
         label = 'base'
         description = "ValleyWorks Backup Manager"
         arguments = [
-            (['-f', '--foo'],
-             dict(action='store', help='the notorious foo option')),
-            (['-C'],
-             dict(action='store_true', help='the big C option')),
             (['extra_arguments'], dict(action='store', nargs='*'))
             ]
 
     @expose(hide=True)
     def default(self):
-        self.app.log.info('Inside MyBaseController.default()')
-        if self.app.pargs.foo:
-            print("Recieved option: foo => %s" % self.app.pargs.foo)
+        self.app.args.parse_args(['--help'])
 
-    @expose(help="backup a file to glacier")
+    @expose(help="Backup a file to glacier")
     def backup(self):
         if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
             self.app.log.error('Must have arguments')
@@ -32,28 +25,40 @@ class MyBaseController(CementBaseController):
         SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
         VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
 
-        GlacierVault(VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY).upload(
-            os.path.abspath("test.txt")
+        self.app.log.info("Uploading file %s" %
+                          self.app.pargs.extra_arguments[0])
+
+        response = GlacierVault(VAULT_NAME,
+                                ACCESS_KEY_ID,
+                                SECRET_ACCESS_KEY).upload(
+            self.app.pargs.extra_arguments[0]
         )
 
-        """
-        # boto.connect_glacier is a shortcut return a Layer2 instance
-        glacier_connection = boto.connect_glacier(
-                                region_name="us-west-2",
-                                aws_access_key_id=ACCESS_KEY_ID,
-                                aws_secret_access_key=SECRET_ACCESS_KEY)
+        if response:
+            self.app.log.info("File %s uploaded." %
+                              self.app.pargs.extra_arguments[0])
+        else:
+            self.app.log.error("Error uploading file")
 
-        self.app.log.info("Creating Glacier Vault %s" % VAULT_NAME)
+    @expose(aliases=['retrieve'], help="retrieves a archive")
+    def download(self):
+        if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
+            self.app.log.error('Must have arguments')
+            return
 
-        vault = glacier_connection.get_vault(VAULT_NAME)
+        ACCESS_KEY_ID = self.app.config.get('base', 'ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
+        VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
 
-        self.app.log.info("Backing up file...")
-        archive_id = vault.upload_archive("test.tgz")
-        #import pdb; pdb.set_trace()
-        """
-    @expose(aliases=['cmd2'], help="more of nothing")
-    def command2(self):
-        self.app.log.info("Inside MyBaseController.command2()")
+        self.app.log.info("Retrieving %s" % self.app.pargs.extra_arguments[0])
+        try:
+            GlacierVault(VAULT_NAME,
+                         ACCESS_KEY_ID,
+                         SECRET_ACCESS_KEY).retrieve(
+                self.app.pargs.extra_arguments[0], True
+            )
+        except Exception as e:
+            self.app.log.error(e)
 
 
 class MySecondController(CementBaseController):

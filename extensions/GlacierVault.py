@@ -1,6 +1,8 @@
-import boto
+import boto3
 import shelve
 import os
+from .exceptions import UnexpectedHTTPResponseError
+
 SHELVE_FILE = os.path.expanduser("~/.valleybackups.db")
 
 
@@ -11,16 +13,18 @@ class glacier_shelve(object):
 
     def __enter__(self):
         self.shelve = shelve.open(SHELVE_FILE)
-
         return self.shelve
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.shelve.close()
 
+
 class GlacierVault:
     """
     Wrapper for uploading/download archive to/from Amazon Glacier Vault
-    Makes use of shelve to store archive id corresponding to filename and waiting jobs.
+    Makes use of shelve to store archive id corresponding to filename
+    and waiting jobs.
+
     Backup:
     >>> GlacierVault("myvault")upload("myfile")
 
@@ -33,35 +37,52 @@ class GlacierVault:
         """
         Initialize the vault
         """
-        layer2 = boto.connect_glacier(
-                                region_name="us-west-2",
-                                aws_access_key_id=ACCESS_KEY_ID,
-                                aws_secret_access_key=SECRET_ACCESS_KEY)
+        client = boto3.client('glacier',
+                              region_name='us-west-2',
+                              aws_access_key_id=ACCESS_KEY_ID,
+                              aws_secret_access_key=SECRET_ACCESS_KEY)
 
-        self.vault = layer2.get_vault(vault_name)
-
+        self.client = client
+        self.vault_name = vault_name
 
     def upload(self, filename):
         """
         Upload filename and store the archive id for future retrieval
         """
-        archive_id = self.vault.create_archive_from_file(filename, description=filename)
 
-        # Storing the filename => archive_id data.
-        with glacier_shelve() as d:
-            if not d.has_key("archives"):
-                d["archives"] = dict()
+        try:
+            with open(filename, mode='rb') as file:  # b is important -> binary
+                fileContent = file.read()
 
-            archives = d["archives"]
-            archives[filename] = archive_id
-            d["archives"] = archives
+                response = self.client.upload_archive(
+                    vaultName=self.vault_name,
+                    archiveDescription=filename,
+                    body=fileContent
+                )
+
+                if response["ResponseMetadata"]["HTTPStatusCode"] == 201:
+                    # Storing the filename => archive_id data.
+                    with glacier_shelve() as d:
+                        # if not d.has_key("archives"):
+                        if "archives" not in d:
+                            d["archives"] = dict()
+
+                        archives = d["archives"]
+                        archives[filename] = response["archiveId"]
+                        d["archives"] = archives
+
+                    return True
+
+        except Exception as e:
+            print e
+            return False
 
     def get_archive_id(self, filename):
         """
         Get the archive_id corresponding to the filename
         """
         with glacier_shelve() as d:
-            if not d.has_key("archives"):
+            if "archives" not in d:
                 d["archives"] = dict()
 
             archives = d["archives"]
@@ -71,16 +92,19 @@ class GlacierVault:
 
         return None
 
+    # TODO: Migrate to boto3
     def retrieve(self, filename, wait_mode=False):
         """
-        Initiate a Job, check its status, and download the archive when it's completed.
+        Initiate a Job, check its status, and download the archive
+        when it's completed.
         """
         archive_id = self.get_archive_id(filename)
         if not archive_id:
+            raise Exception("This file was not uploaded with this tool.")
             return
 
         with glacier_shelve() as d:
-            if not d.has_key("jobs"):
+            if "jobs" not in d:
                 d["jobs"] = dict()
 
             jobs = d["jobs"]
@@ -91,7 +115,8 @@ class GlacierVault:
                 job_id = jobs[filename]
                 try:
                     job = self.vault.get_job(job_id)
-                except UnexpectedHTTPResponseError: # Return a 404 if the job is no more available
+                except UnexpectedHTTPResponseError:
+                    # Return a 404 if the job is no more available
                     pass
 
             if not job:

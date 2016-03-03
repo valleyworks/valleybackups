@@ -2,7 +2,7 @@
 # Created by https://www.gitignore.io/api/python
 
 *.conf
-
+*.txt
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
