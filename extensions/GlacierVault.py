@@ -1,7 +1,6 @@
 import boto3
 import shelve
 import os
-from .exceptions import UnexpectedHTTPResponseError
 
 SHELVE_FILE = os.path.expanduser("~/.valleybackups.db")
 
@@ -71,7 +70,7 @@ class GlacierVault:
                         archives[filename] = response["archiveId"]
                         d["archives"] = archives
 
-                    return True
+                    return response
 
         except Exception as e:
             print e
@@ -115,7 +114,7 @@ class GlacierVault:
                 job_id = jobs[filename]
                 try:
                     job = self.vault.get_job(job_id)
-                except UnexpectedHTTPResponseError:
+                except Exception:
                     # Return a 404 if the job is no more available
                     pass
 

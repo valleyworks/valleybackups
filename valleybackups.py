@@ -1,6 +1,7 @@
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
 from extensions.GlacierVault import GlacierVault
+import db
 
 
 class MyBaseController(CementBaseController):
@@ -37,6 +38,7 @@ class MyBaseController(CementBaseController):
         if response:
             self.app.log.info("File %s uploaded." %
                               self.app.pargs.extra_arguments[0])
+            db.create_archive(self.app.pargs.extra_arguments[0], VAULT_NAME, response)
         else:
             self.app.log.error("Error uploading file")
 
@@ -81,5 +83,7 @@ class ValleyBackups(CementApp):
 with ValleyBackups() as app:
     # Parse a configuration file
     app.config.parse_file('./valleybackups.conf')
+
+    db.init(app.config.get('glacier', 'VAULT_NAME'))
 
     app.run()
