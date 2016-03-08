@@ -1,6 +1,7 @@
 from pony.orm import *
+import os
 
-dbName = "database.sqlite"
+dbName = os.path.dirname(__file__) + "/database.sqlite"
 db = Database("sqlite", dbName, create_db=True)
 
 
@@ -39,10 +40,11 @@ def create_archive(name, vault_name, data):
     # archive = Archive(storage=self.storage)
 
 
-def init(vault_name):
+def init(vault_name, debug):
     vault_name = vault_name
 
-    sql_debug(True)
+    if debug:
+        sql_debug(True)
     db.generate_mapping(create_tables=True)
 
     with db_session:

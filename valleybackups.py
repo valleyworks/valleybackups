@@ -1,10 +1,12 @@
+#!/usr/bin/python
+
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
 from extensions.GlacierVault import GlacierVault
 from cement.core.exc import CaughtSignal
 from extensions.progressbar import progress_bar_loading
 import db
-
+from os.path import dirname
 
 class MyBaseController(CementBaseController):
     class Meta:
@@ -94,8 +96,8 @@ class ValleyBackups(CementApp):
 
 with ValleyBackups() as app:
     # Parse a configuration file
-    app.config.parse_file('./valleybackups.conf')
+    app.config.parse_file(dirname(__file__) + '/valleybackups.conf')
 
-    db.init(app.config.get('glacier', 'VAULT_NAME'))
+    db.init(app.config.get('glacier', 'VAULT_NAME'), app.debug)
 
     app.run()
