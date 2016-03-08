@@ -73,8 +73,7 @@ class GlacierVault:
                     return response
 
         except Exception as e:
-            print e
-            return False
+            raise
 
     def get_archive_id(self, filename):
         """

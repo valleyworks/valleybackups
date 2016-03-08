@@ -1,6 +1,8 @@
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
 from extensions.GlacierVault import GlacierVault
+from cement.core.exc import CaughtSignal
+from extensions.progressbar import progress_bar_loading
 import db
 
 
@@ -29,18 +31,28 @@ class MyBaseController(CementBaseController):
         self.app.log.info("Uploading file %s" %
                           self.app.pargs.extra_arguments[0])
 
-        response = GlacierVault(VAULT_NAME,
-                                ACCESS_KEY_ID,
-                                SECRET_ACCESS_KEY).upload(
-            self.app.pargs.extra_arguments[0]
-        )
+        p = progress_bar_loading()
+        p.start()
 
-        if response:
-            self.app.log.info("File %s uploaded." %
-                              self.app.pargs.extra_arguments[0])
-            db.create_archive(self.app.pargs.extra_arguments[0], VAULT_NAME, response)
-        else:
-            self.app.log.error("Error uploading file")
+        try:
+            response = GlacierVault(VAULT_NAME,
+                                    ACCESS_KEY_ID,
+                                    SECRET_ACCESS_KEY).upload(
+                self.app.pargs.extra_arguments[0]
+            )
+
+            if response:
+                self.app.log.info("File %s uploaded." %
+                                  self.app.pargs.extra_arguments[0])
+                db.create_archive(self.app.pargs.extra_arguments[0], VAULT_NAME, response)
+            else:
+                self.app.log.error("Error uploading file")
+            p.stop()
+
+        except CaughtSignal as e:
+            p.kill()
+        except KeyboardInterrupt or EOFError:
+            p.kill()
 
     @expose(aliases=['retrieve'], help="retrieves a archive")
     def download(self):
