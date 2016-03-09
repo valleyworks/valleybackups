@@ -129,18 +129,20 @@ class GlacierVault:
         """
 
         # TODO: replace with configuration, and actual archive id from database
-        archive = self.glacier.Archive('3452345',self.vault_name,'asdasd')
+        archive = self.glacier.Archive('354029675239',self.vault_name,'OGjB_7Py45B3CC-d7DrydgAeaQF2ZXl7IGbCa5EACvzrTO52Tt4WMRWsyQmDAh4hFWOJnbk-rS3-YBHXmBjpEWE2kA8RuHbLIl58cPZTNwnTGkm7_ZZx7cJL9c20Q1bWL3ELJReC8g')
         job = archive.initiate_archive_retrieval()
+        db.create_job(job.account_id, self.vault_name, job.id)
 
-        try:
-            output = job.get_output()
-        except ClientError as e:
-            raise
+        # try:
+        #     output = job.get_output()
+        # except ClientError as e:
+        #     raise
 
         job_id = job
-        print "Job {action}: {status_code} ({creation_date}/{completion_date})".format(**job.__dict__)
-
+        print "Job %s: %s ( %s / %s )" % (job.action, job.status_code, str(job.creation_date), str(job.completion_date))
         # checking manually if job is completed every 10 secondes instead of using Amazon SNS
+
+        """
         if wait_mode:
             import time
             while 1:
@@ -155,3 +157,4 @@ class GlacierVault:
             job.download_to_file(filename)
         else:
             print "Not completed yet"
+        """
