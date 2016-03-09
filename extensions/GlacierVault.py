@@ -1,6 +1,8 @@
 import boto3
+from botocore.exceptions import ClientError
 import shelve
 import os
+import db
 
 SHELVE_FILE = os.path.expanduser("~/.valleybackups.db")
 
@@ -41,7 +43,15 @@ class GlacierVault:
                               aws_access_key_id=ACCESS_KEY_ID,
                               aws_secret_access_key=SECRET_ACCESS_KEY)
 
+        self.glacier = boto3.resource('glacier',
+                                region_name='us-west-2',
+                                aws_access_key_id=ACCESS_KEY_ID,
+                                aws_secret_access_key=SECRET_ACCESS_KEY)
+
+        vault = self.glacier.Vault('354029675239', vault_name)
+
         self.client = client
+        self.vault = vault
         self.vault_name = vault_name
 
     def upload(self, filename):
@@ -53,23 +63,13 @@ class GlacierVault:
             with open(filename, mode='rb') as file:  # b is important -> binary
                 fileContent = file.read()
 
-                response = self.client.upload_archive(
-                    vaultName=self.vault_name,
+                response = self.vault.upload_archive(
                     archiveDescription=filename,
                     body=fileContent
                 )
 
-                if response["ResponseMetadata"]["HTTPStatusCode"] == 201:
-                    # Storing the filename => archive_id data.
-                    with glacier_shelve() as d:
-                        # if not d.has_key("archives"):
-                        if "archives" not in d:
-                            d["archives"] = dict()
-
-                        archives = d["archives"]
-                        archives[filename] = response["archiveId"]
-                        d["archives"] = archives
-
+                if response:
+                    db.create_archive(filename, response.vault_name, response.id)
                     return response
 
         except Exception as e:
@@ -96,11 +96,12 @@ class GlacierVault:
         Initiate a Job, check its status, and download the archive
         when it's completed.
         """
+
+        """
         archive_id = self.get_archive_id(filename)
         if not archive_id:
             raise Exception("This file was not uploaded with this tool.")
             return
-
         with glacier_shelve() as d:
             if "jobs" not in d:
                 d["jobs"] = dict()
@@ -125,7 +126,18 @@ class GlacierVault:
 
             # Commiting changes in shelve
             d["jobs"] = jobs
+        """
 
+        # TODO: replace with configuration, and actual archive id from database
+        archive = self.glacier.Archive('3452345',self.vault_name,'asdasd')
+        job = archive.initiate_archive_retrieval()
+
+        try:
+            output = job.get_output()
+        except ClientError as e:
+            raise
+
+        job_id = job
         print "Job {action}: {status_code} ({creation_date}/{completion_date})".format(**job.__dict__)
 
         # checking manually if job is completed every 10 secondes instead of using Amazon SNS

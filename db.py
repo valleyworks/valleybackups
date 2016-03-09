@@ -27,15 +27,15 @@ class ArchivePart(db.Entity):
     archive = Required(Archive)
 
 
-def create_archive(name, vault_name, data):
+def create_archive(name, vault_name, archiveId):
     with db_session:
         storage = Storage.get(name=vault_name)
         Archive(
             name=name,
             storage=storage,
-            location=data["location"],
-            checksum=data["checksum"],
-            archiveId=data["archiveId"])
+            location=" ",
+            checksum=" ",
+            archiveId=archiveId)
         commit()
     # archive = Archive(storage=self.storage)
 

@@ -6,7 +6,7 @@ from extensions.GlacierVault import GlacierVault
 from cement.core.exc import CaughtSignal
 from extensions.progressbar import progress_bar_loading
 import db
-from os.path import dirname
+from os.path import dirname, abspath
 
 class MyBaseController(CementBaseController):
     class Meta:
@@ -15,6 +15,16 @@ class MyBaseController(CementBaseController):
         arguments = [
             (['extra_arguments'], dict(action='store', nargs='*'))
             ]
+
+
+
+    def _setup(self, obj):
+        # always run core setup first
+        super(MyBaseController, self)._setup(obj)
+
+        self.ACCESS_KEY_ID = self.app.config.get('base', 'ACCESS_KEY_ID')
+        self.SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
+        self.VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
 
     @expose(hide=True)
     def default(self):
@@ -26,27 +36,23 @@ class MyBaseController(CementBaseController):
             self.app.log.error('Must have arguments')
             return
 
-        ACCESS_KEY_ID = self.app.config.get('base', 'ACCESS_KEY_ID')
-        SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
-        VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
-
         self.app.log.info("Uploading file %s" %
                           self.app.pargs.extra_arguments[0])
 
         p = progress_bar_loading()
-        p.start()
+        # p.start()
 
         try:
-            response = GlacierVault(VAULT_NAME,
-                                    ACCESS_KEY_ID,
-                                    SECRET_ACCESS_KEY).upload(
+            response = GlacierVault(self.VAULT_NAME,
+                                    self.ACCESS_KEY_ID,
+                                    self.SECRET_ACCESS_KEY).upload(
                 self.app.pargs.extra_arguments[0]
             )
 
             if response:
                 self.app.log.info("File %s uploaded." %
                                   self.app.pargs.extra_arguments[0])
-                db.create_archive(self.app.pargs.extra_arguments[0], VAULT_NAME, response)
+                # db.create_archive(self.app.pargs.extra_arguments[0], response.vault_name, response.id)
             else:
                 self.app.log.error("Error uploading file")
             p.stop()
@@ -62,15 +68,11 @@ class MyBaseController(CementBaseController):
             self.app.log.error('Must have arguments')
             return
 
-        ACCESS_KEY_ID = self.app.config.get('base', 'ACCESS_KEY_ID')
-        SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
-        VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
-
         self.app.log.info("Retrieving %s" % self.app.pargs.extra_arguments[0])
         try:
-            GlacierVault(VAULT_NAME,
-                         ACCESS_KEY_ID,
-                         SECRET_ACCESS_KEY).retrieve(
+            GlacierVault(self.VAULT_NAME,
+                         self.ACCESS_KEY_ID,
+                         self.SECRET_ACCESS_KEY).retrieve(
                 self.app.pargs.extra_arguments[0], True
             )
         except Exception as e:
@@ -88,16 +90,14 @@ class MySecondController(CementBaseController):
 
 
 class ValleyBackups(CementApp):
+
     class Meta:
         label = 'valleybackups'
         base_controller = 'base'
         handlers = [MyBaseController, MySecondController]
+        config_files = [abspath(dirname(__file__)) + '/valleybackups.conf']
 
 
 with ValleyBackups() as app:
-    # Parse a configuration file
-    app.config.parse_file(dirname(__file__) + '/valleybackups.conf')
-
     db.init(app.config.get('glacier', 'VAULT_NAME'), app.debug)
-
     app.run()
