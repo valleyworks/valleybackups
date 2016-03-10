@@ -25,6 +25,12 @@ class MyBaseController(CementBaseController):
         self.ACCESS_KEY_ID = self.app.config.get('base', 'ACCESS_KEY_ID')
         self.SECRET_ACCESS_KEY = self.app.config.get('base', 'SECRET_ACCESS_KEY')
         self.VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
+        self.AWS_ACCOUNT_ID = self.app.config.get('base', 'AWS_ACCOUNT_ID')
+
+        self.glacier = GlacierVault(self.VAULT_NAME,
+                                self.ACCESS_KEY_ID,
+                                self.SECRET_ACCESS_KEY,
+                                self.AWS_ACCOUNT_ID)
 
     @expose(hide=True)
     def default(self):
@@ -43,9 +49,7 @@ class MyBaseController(CementBaseController):
         # p.start()
 
         try:
-            response = GlacierVault(self.VAULT_NAME,
-                                    self.ACCESS_KEY_ID,
-                                    self.SECRET_ACCESS_KEY).upload(
+            response = self.glacier.upload(
                 self.app.pargs.extra_arguments[0]
             )
 
@@ -62,22 +66,29 @@ class MyBaseController(CementBaseController):
         except KeyboardInterrupt or EOFError:
             p.kill()
 
-    @expose(aliases=['retrieve'], help="retrieves a archive")
-    def download(self):
+    @expose(help="initiates archive retrieval")
+    def request_file(self):
         if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
             self.app.log.error('Must have arguments')
             return
 
         self.app.log.info("Retrieving %s" % self.app.pargs.extra_arguments[0])
         try:
-            GlacierVault(self.VAULT_NAME,
-                         self.ACCESS_KEY_ID,
-                         self.SECRET_ACCESS_KEY).retrieve(
+            self.glacier.retrieve(
                 self.app.pargs.extra_arguments[0], True
             )
         except Exception as e:
             self.app.log.error(e)
 
+    @expose(help="download a finished archive retrieval")
+    def download_file(self):
+        if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
+            self.app.log.error('Must have arguments')
+            return
+
+        response = self.glacier.download_file(
+            self.app.pargs.extra_arguments[0]
+        )
 
 class MySecondController(CementBaseController):
     class Meta:

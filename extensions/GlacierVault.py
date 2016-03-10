@@ -34,7 +34,7 @@ class GlacierVault:
     or to wait until the job is ready:
     >>> GlacierVault("myvault")retrieve("serverhealth2.py", True)
     """
-    def __init__(self, vault_name, ACCESS_KEY_ID, SECRET_ACCESS_KEY):
+    def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID):
         """
         Initialize the vault
         """
@@ -48,11 +48,12 @@ class GlacierVault:
                                 aws_access_key_id=ACCESS_KEY_ID,
                                 aws_secret_access_key=SECRET_ACCESS_KEY)
 
-        vault = self.glacier.Vault('354029675239', vault_name)
+        vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
         self.client = client
         self.vault = vault
-        self.vault_name = vault_name
+        self.VAULT_NAME = VAULT_NAME
+        self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
 
     def upload(self, filename):
         """
@@ -75,21 +76,6 @@ class GlacierVault:
         except Exception as e:
             raise
 
-    def get_archive_id(self, filename):
-        """
-        Get the archive_id corresponding to the filename
-        """
-        with glacier_shelve() as d:
-            if "archives" not in d:
-                d["archives"] = dict()
-
-            archives = d["archives"]
-
-            if filename in archives:
-                return archives[filename]
-
-        return None
-
     # TODO: Migrate to boto3
     def retrieve(self, filename, wait_mode=False):
         """
@@ -97,41 +83,10 @@ class GlacierVault:
         when it's completed.
         """
 
-        """
-        archive_id = self.get_archive_id(filename)
-        if not archive_id:
-            raise Exception("This file was not uploaded with this tool.")
-            return
-        with glacier_shelve() as d:
-            if "jobs" not in d:
-                d["jobs"] = dict()
-
-            jobs = d["jobs"]
-            job = None
-
-            if filename in jobs:
-                # The job is already in shelve
-                job_id = jobs[filename]
-                try:
-                    job = self.vault.get_job(job_id)
-                except Exception:
-                    # Return a 404 if the job is no more available
-                    pass
-
-            if not job:
-                # Job initialization
-                job = self.vault.retrieve_archive(archive_id)
-                jobs[filename] = job.id
-                job_id = job.id
-
-            # Commiting changes in shelve
-            d["jobs"] = jobs
-        """
-
         # TODO: replace with configuration, and actual archive id from database
-        archive = self.glacier.Archive('354029675239',self.vault_name,'OGjB_7Py45B3CC-d7DrydgAeaQF2ZXl7IGbCa5EACvzrTO52Tt4WMRWsyQmDAh4hFWOJnbk-rS3-YBHXmBjpEWE2kA8RuHbLIl58cPZTNwnTGkm7_ZZx7cJL9c20Q1bWL3ELJReC8g')
+        archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,'OGjB_7Py45B3CC-d7DrydgAeaQF2ZXl7IGbCa5EACvzrTO52Tt4WMRWsyQmDAh4hFWOJnbk-rS3-YBHXmBjpEWE2kA8RuHbLIl58cPZTNwnTGkm7_ZZx7cJL9c20Q1bWL3ELJReC8g')
         job = archive.initiate_archive_retrieval()
-        db.create_job(job.account_id, self.vault_name, job.id)
+        db.create_job(job.account_id, self.VAULT_NAME, job.id)
 
         # try:
         #     output = job.get_output()
@@ -158,3 +113,24 @@ class GlacierVault:
         else:
             print "Not completed yet"
         """
+
+    # TODO: Refactor to download file in chunks
+    def download_file(self, job_id):
+        """
+        Downloads a file which job has finished correctly
+        """
+        job = self.glacier.Job(self.AWS_ACCOUNT_ID, self.VAULT_NAME, job_id)
+
+        # Downloads the archive
+        output = job.get_output()
+
+        # Gets file name
+        file_name = output["archiveDescription"]
+
+        # Reads the file content
+        file_body = output["body"].read()
+
+        with open(file_name, "wb") as f:
+            f.write(file_body)
+
+        import pdb; pdb.set_trace()
