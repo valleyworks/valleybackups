@@ -82,6 +82,9 @@ class MyBaseController(CementBaseController):
 
     @expose(help="download a finished archive retrieval")
     def download_file(self):
+        """
+        .. py:function:: enumerate(sequence[, start=0])
+        """
         if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
             self.app.log.error('Must have arguments')
             return
@@ -110,5 +113,10 @@ class ValleyBackups(CementApp):
 
 
 with ValleyBackups() as app:
-    db.init(app.config.get('glacier', 'VAULT_NAME'), app.debug)
-    app.run()
+    def get_config(section, key):
+        return app.config.get(section, key)
+
+    # If running python valleybackups.py
+    if __name__ == '__main__':
+        db.init(app.config.get('glacier', 'VAULT_NAME'), app.debug)
+        app.run()

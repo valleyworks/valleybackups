@@ -86,7 +86,7 @@ class GlacierVault:
         # TODO: replace with configuration, and actual archive id from database
         archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,'OGjB_7Py45B3CC-d7DrydgAeaQF2ZXl7IGbCa5EACvzrTO52Tt4WMRWsyQmDAh4hFWOJnbk-rS3-YBHXmBjpEWE2kA8RuHbLIl58cPZTNwnTGkm7_ZZx7cJL9c20Q1bWL3ELJReC8g')
         job = archive.initiate_archive_retrieval()
-        db.create_job(job.account_id, self.VAULT_NAME, job.id)
+        db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code)
 
         # try:
         #     output = job.get_output()

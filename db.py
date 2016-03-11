@@ -28,6 +28,7 @@ class Job(db.Entity):
     account_id = Required(str)
     job_id = Required(str)
     storage = Required(Storage)
+    status = Required(str)
 
 
 class ArchivePart(db.Entity):
@@ -47,7 +48,8 @@ def create_archive(name, vault_name, archiveId):
         commit()
     # archive = Archive(storage=self.storage)
 
-def create_job(account_id, vault_name, job_id):
+@db_session
+def create_job(account_id, vault_name, job_id, status_code):
     """Creates Job in DB
         This is needed to start the Retreival Job and track it.
     """
@@ -56,15 +58,30 @@ def create_job(account_id, vault_name, job_id):
         Job(
             account_id=account_id,
             storage=storage,
-            job_id=job_id)
+            job_id=job_id,
+            status=status_code)
         commit()
+
+@db_session
+def update_job(job_id, status_code):
+    """Updates job status
+    """
+    import pdb; pdb.set_trace()
+    job = Job.get(job_id=job_id)
+    job.status = status_code
+    commit()
+
+def init_mapping():
+    db.generate_mapping(create_tables=True)
+    
 
 def init(vault_name, debug):
     vault_name = vault_name
 
     if debug:
         sql_debug(True)
-    db.generate_mapping(create_tables=True)
+
+    init_mapping()
 
     with db_session:
         if count(s for s in Storage if s.name == vault_name) is 0:
