@@ -132,5 +132,3 @@ class GlacierVault:
 
         with open(file_name, "wb") as f:
             f.write(file_body)
-
-        import pdb; pdb.set_trace()

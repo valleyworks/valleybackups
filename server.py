@@ -23,6 +23,7 @@ def msg_process(msg, tstamp):
     archiveId = js["ArchiveId"]
     jobId = js["JobId"]
 
+    app.logger.info("Processing job: %s with status: %s" % (jobId, js["StatusCode"])) 
     # Updates job status
     db.update_job(jobId, js["StatusCode"])
 

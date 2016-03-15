@@ -66,7 +66,6 @@ def create_job(account_id, vault_name, job_id, status_code):
 def update_job(job_id, status_code):
     """Updates job status
     """
-    import pdb; pdb.set_trace()
     job = Job.get(job_id=job_id)
     job.status = status_code
     commit()
