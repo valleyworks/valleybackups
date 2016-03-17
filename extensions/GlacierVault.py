@@ -70,7 +70,9 @@ class GlacierVault:
                 )
 
                 if response:
-                    db.create_archive(filename, response.vault_name, response.id)
+		    import hashlib
+                    fileHash = hashlib.sha256(fileContent)
+                    db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
                     return response
 
         except Exception as e:
@@ -125,10 +127,18 @@ class GlacierVault:
         output = job.get_output()
 
         # Gets file name
-        file_name = output["archiveDescription"]
-
+        archive_name = output["archiveDescription"]
+	file_name = os.path.split(archive_name)[1] # Removes absolute path if there is one
         # Reads the file content
         file_body = output["body"].read()
 
-        with open(file_name, "wb") as f:
-            f.write(file_body)
+	# Calculate hash tree
+	import hashlib
+	file_hash = hashlib.sha256(file_body)
+
+	if file_hash.hexdigest() == job.sha256_tree_hash:
+	    print "Checksum OK"
+            with open(file_name, "wb") as f:
+                f.write(file_body)
+	else:
+	    print "Checksum ERROR"
