@@ -30,4 +30,21 @@ VAULT_NAME=...
 
 ## Usage
 
+### Bootup server (for sns notifications)
+
+This server listens to SNS notifications, and triggers file downloads when a requested file is ready.
+
+Run `nohup server.py &`
+
+### Backup
+
 Run `valleybackups backup <file>`
+
+### List Archives
+
+Run `valleybackups list-files`
+
+### Request file
+
+Run `valleybackups request-file <id>` (id is listed on list-files command)
+
