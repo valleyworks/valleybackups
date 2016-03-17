@@ -1,23 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
-import shelve
 import os
 import db
-
-SHELVE_FILE = os.path.expanduser("~/.valleybackups.db")
-
-
-class glacier_shelve(object):
-    """
-    Context manager for shelve
-    """
-
-    def __enter__(self):
-        self.shelve = shelve.open(SHELVE_FILE)
-        return self.shelve
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.shelve.close()
 
 
 class GlacierVault:
@@ -37,6 +21,10 @@ class GlacierVault:
     def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID):
         """
         Initialize the vault
+	VAULT_NAME : str
+	ACCESS_KEY_ID : str
+	SECRET_ACCESS_KEY : str
+	AWS_ACCOUNT_ID : str
         """
         client = boto3.client('glacier',
                               region_name='us-west-2',
@@ -58,6 +46,8 @@ class GlacierVault:
     def upload(self, filename):
         """
         Upload filename and store the archive id for future retrieval
+
+	filename: string
         """
 
         try:
@@ -82,6 +72,9 @@ class GlacierVault:
         """
         Initiate a Job, check its status, and download the archive
         when it's completed.
+
+	archive_id : str
+	wait_mode : bool
         """
 
         # TODO: replace with configuration, and actual archive id from database
@@ -120,6 +113,8 @@ class GlacierVault:
     def download_file(self, job_id):
         """
         Downloads a file which job has finished correctly
+
+	job_id: str
         """
         job = self.glacier.Job(self.AWS_ACCOUNT_ID, self.VAULT_NAME, job_id)
 

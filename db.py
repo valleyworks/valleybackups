@@ -53,6 +53,11 @@ def create_archive(name, vault_name, archiveId, checksum):
 def create_job(account_id, vault_name, job_id, status_code, archive_id):
     """Creates Job in DB
         This is needed to start the Retreival Job and track it.
+	account_id : str
+	vault_name : str
+	job_id : str
+	status_code : str
+	archive_id : str
     """
     with db_session:
         storage = Storage.get(name=vault_name)
@@ -69,6 +74,8 @@ def create_job(account_id, vault_name, job_id, status_code, archive_id):
 @db_session
 def update_job(job_id, status_code):
     """Updates job status
+	job_id : str
+	status_code : str
     """
     job = Job.get(job_id=job_id)
     job.status = status_code
