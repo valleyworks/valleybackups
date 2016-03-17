@@ -21,6 +21,7 @@ class Archive(db.Entity):
     checksum = Optional(str)
     archiveId = Required(str)
     archive_parts = Set("ArchivePart")
+    jobs = Set("Job")
 
 
 class Job(db.Entity):
@@ -29,7 +30,7 @@ class Job(db.Entity):
     job_id = Required(str)
     storage = Required(Storage)
     status = Required(str)
-
+    archive = Required(Archive)
 
 class ArchivePart(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -49,17 +50,20 @@ def create_archive(name, vault_name, archiveId):
     # archive = Archive(storage=self.storage)
 
 @db_session
-def create_job(account_id, vault_name, job_id, status_code):
+def create_job(account_id, vault_name, job_id, status_code, archive_id):
     """Creates Job in DB
         This is needed to start the Retreival Job and track it.
     """
     with db_session:
         storage = Storage.get(name=vault_name)
+	archive = Archive.get(archiveId=archive_id)
         Job(
             account_id=account_id,
             storage=storage,
             job_id=job_id,
-            status=status_code)
+            status=status_code,
+	    archive=archive
+	)
         commit()
 
 @db_session

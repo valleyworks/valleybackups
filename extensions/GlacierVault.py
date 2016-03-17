@@ -76,17 +76,16 @@ class GlacierVault:
         except Exception as e:
             raise
 
-    # TODO: Migrate to boto3
-    def retrieve(self, filename, wait_mode=False):
+    def retrieve(self, archive_id, wait_mode=False):
         """
         Initiate a Job, check its status, and download the archive
         when it's completed.
         """
 
         # TODO: replace with configuration, and actual archive id from database
-        archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,'OGjB_7Py45B3CC-d7DrydgAeaQF2ZXl7IGbCa5EACvzrTO52Tt4WMRWsyQmDAh4hFWOJnbk-rS3-YBHXmBjpEWE2kA8RuHbLIl58cPZTNwnTGkm7_ZZx7cJL9c20Q1bWL3ELJReC8g')
+        archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,archive_id)
         job = archive.initiate_archive_retrieval()
-        db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code)
+        db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code,archive_id)
 
         # try:
         #     output = job.get_output()
@@ -95,6 +94,7 @@ class GlacierVault:
 
         job_id = job
         print "Job %s: %s ( %s / %s )" % (job.action, job.status_code, str(job.creation_date), str(job.completion_date))
+	print "Job ID: %s" % job.id
         # checking manually if job is completed every 10 secondes instead of using Amazon SNS
 
         """
