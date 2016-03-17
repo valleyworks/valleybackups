@@ -17,8 +17,8 @@ class Archive(db.Entity):
     id = PrimaryKey(int, auto=True)
     storage = Required(Storage)
     name = Required(str)
-    location = Required(str)
-    checksum = Required(str)
+    location = Optional(str)
+    checksum = Optional(str)
     archiveId = Required(str)
     archive_parts = Set("ArchivePart")
 
@@ -69,6 +69,15 @@ def update_job(job_id, status_code):
     job = Job.get(job_id=job_id)
     job.status = status_code
     commit()
+
+@db_session
+def get_files():
+    files = Archive.select()[:]
+    return files
+
+@db_session
+def get_archive_id(id):
+    return Archive.get(id=id).archiveId
 
 def init_mapping():
     db.generate_mapping(create_tables=True)

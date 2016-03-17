@@ -73,10 +73,11 @@ class MyBaseController(CementBaseController):
             return
 
         self.app.log.info("Retrieving %s" % self.app.pargs.extra_arguments[0])
+	
+	archive_id = db.get_archive_id(self.app.pargs.extra_arguments[0])
+
         try:
-            self.glacier.retrieve(
-                self.app.pargs.extra_arguments[0], True
-            )
+            self.glacier.retrieve(archive_id, True)
         except Exception as e:
             self.app.log.error(e)
 
@@ -92,6 +93,13 @@ class MyBaseController(CementBaseController):
         response = self.glacier.download_file(
             self.app.pargs.extra_arguments[0]
         )
+
+    @expose(help="List archives on glacier")
+    def list_files(self):
+	archives = db.get_files()
+	print "ID - NAME"
+	for archive in archives:
+	    print " %s - %s" % (archive.id, archive.name)
 
 class MySecondController(CementBaseController):
     class Meta:
