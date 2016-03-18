@@ -9,7 +9,7 @@ A Backup tool with AWS Glacier support
 
 * Grant execution permissions to `valleybackups.sh` with the command `chmod +x valleybackups.sh`
 
-* Finally, make a symbolic link. For example: `ln -s /opt/glacierbackups/valleybackups.sh /usr/bin/valleybackups`
+* Finally, make a symbolic link. For example: `sudo ln -s /opt/glacierbackups/valleybackups.sh /usr/bin/valleybackups`
 
 ## Configuration
 
@@ -34,7 +34,8 @@ VAULT_NAME=...
 
 This server listens to SNS notifications, and triggers file downloads when a requested file is ready.
 
-Run `nohup server.py &`
+Run `supervisord` to start the process watcher
+Run `supervisorctl status` to check if the server is RUNNING
 
 ### Backup
 
