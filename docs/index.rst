@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 2
    
    howitworks.rst
+   cli.rst
+   controllers.rst
    db.rst
    glacier.rst
 
