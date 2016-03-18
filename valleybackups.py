@@ -101,6 +101,15 @@ class MyBaseController(CementBaseController):
 	for archive in archives:
 	    print " %s - %s" % (archive.id, archive.name)
 
+    @expose(help="List uncompleted jobs")
+    def list_uncompleted_jobs(self):
+	"""Outputs uncompleted jobs to the console
+        """
+	jobs = db.get_uncompleted_jobs()
+	print "ID - ARCHIVE"
+	for job in jobs:
+	     print " %s - %s" % (job[0], job[1])
+
 class MySecondController(CementBaseController):
     class Meta:
         label = 'second'
