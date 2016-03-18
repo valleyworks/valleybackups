@@ -90,6 +90,14 @@ def get_files():
 def get_archive_id(id):
     return Archive.get(id=id).archiveId
 
+@db_session
+def get_uncompleted_jobs():
+    """Returns uncompleted jobs
+    These are file requests waiting for download
+    """
+    jobs = select((j.id, a.name) for j in Job for a in j.archive if j.status != "Succeeded")
+    return jobs[:]
+
 def init_mapping():
     db.generate_mapping(create_tables=True)
     

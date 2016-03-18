@@ -62,52 +62,28 @@ class GlacierVault:
                 if response:
 		    import hashlib
                     fileHash = hashlib.sha256(fileContent)
+		    filename = os.path.split(filename)[1] # Removes absolute path if there is one
                     db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
                     return response
 
         except Exception as e:
             raise
 
-    def retrieve(self, archive_id, wait_mode=False):
+    def retrieve(self, archive_id):
         """
         Initiate a Job, check its status, and download the archive
         when it's completed.
 
 	archive_id : str
-	wait_mode : bool
         """
 
-        # TODO: replace with configuration, and actual archive id from database
         archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,archive_id)
         job = archive.initiate_archive_retrieval()
         db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code,archive_id)
 
-        # try:
-        #     output = job.get_output()
-        # except ClientError as e:
-        #     raise
-
         job_id = job
         print "Job %s: %s ( %s / %s )" % (job.action, job.status_code, str(job.creation_date), str(job.completion_date))
 	print "Job ID: %s" % job.id
-        # checking manually if job is completed every 10 secondes instead of using Amazon SNS
-
-        """
-        if wait_mode:
-            import time
-            while 1:
-                job = self.vault.get_job(job_id)
-                if not job.completed:
-                    time.sleep(10)
-                else:
-                    break
-
-        if job.completed:
-            print "Downloading..."
-            job.download_to_file(filename)
-        else:
-            print "Not completed yet"
-        """
 
     # TODO: Refactor to download file in chunks
     def download_file(self, job_id):

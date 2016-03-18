@@ -7,6 +7,7 @@ from cement.core.exc import CaughtSignal
 from extensions.progressbar import progress_bar_loading
 import db
 from os.path import dirname, abspath
+import os
 
 class MyBaseController(CementBaseController):
     class Meta:
@@ -41,21 +42,20 @@ class MyBaseController(CementBaseController):
         if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
             self.app.log.error('Must have arguments')
             return
-
-        self.app.log.info("Uploading file %s" %
-                          self.app.pargs.extra_arguments[0])
+	filename = os.path.split(self.app.pargs.extra_arguments[0])[1] # Removes absolute path if there is one
+        self.app.log.info("Uploading file %s" % filename)
 
         p = progress_bar_loading()
         # p.start()
 
         try:
             response = self.glacier.upload(
-                self.app.pargs.extra_arguments[0]
+		filename
             )
 
             if response:
                 self.app.log.info("File %s uploaded." %
-                                  self.app.pargs.extra_arguments[0])
+                         		filename)
                 # db.create_archive(self.app.pargs.extra_arguments[0], response.vault_name, response.id)
             else:
                 self.app.log.error("Error uploading file")
@@ -77,7 +77,7 @@ class MyBaseController(CementBaseController):
 	archive_id = db.get_archive_id(self.app.pargs.extra_arguments[0])
 
         try:
-            self.glacier.retrieve(archive_id, True)
+            self.glacier.retrieve(archive_id)
         except Exception as e:
             self.app.log.error(e)
 
@@ -100,6 +100,15 @@ class MyBaseController(CementBaseController):
 	print "ID - NAME"
 	for archive in archives:
 	    print " %s - %s" % (archive.id, archive.name)
+
+    @expose(help="List uncompleted jobs")
+    def list_uncompleted_jobs(self):
+	"""Outputs uncompleted jobs to the console
+        """
+	jobs = db.get_uncompleted_jobs()
+	print "ID - ARCHIVE"
+	for job in jobs:
+	     print " %s - %s" % (job[0], job[1])
 
 class MySecondController(CementBaseController):
     class Meta:
