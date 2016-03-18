@@ -2,7 +2,7 @@
 
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
-from extensions.GlacierVault import GlacierVault
+from extensions.glacier import GlacierClient
 from cement.core.exc import CaughtSignal
 from extensions.progressbar import progress_bar_loading
 import db
@@ -28,7 +28,7 @@ class MyBaseController(CementBaseController):
         self.VAULT_NAME = self.app.config.get('glacier', 'VAULT_NAME')
         self.AWS_ACCOUNT_ID = self.app.config.get('base', 'AWS_ACCOUNT_ID')
 
-        self.glacier = GlacierVault(self.VAULT_NAME,
+        self.glacier = GlacierClient(self.VAULT_NAME,
                                 self.ACCESS_KEY_ID,
                                 self.SECRET_ACCESS_KEY,
                                 self.AWS_ACCOUNT_ID)
@@ -68,10 +68,14 @@ class MyBaseController(CementBaseController):
 
     @expose(help="initiates archive retrieval")
     def request_file(self):
-        if len(self.app.pargs.extra_arguments) == 0:  # has extra arguments
-            self.app.log.error('Must have arguments')
-            return
+        """Requests a backup from Glacier
 
+        Parameters
+        ----------
+            archive_id : str
+                The AWS Glacier archive id
+
+        """
         self.app.log.info("Retrieving %s" % self.app.pargs.extra_arguments[0])
 	
 	archive_id = db.get_archive_id(self.app.pargs.extra_arguments[0])

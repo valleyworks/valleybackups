@@ -4,28 +4,18 @@ import os
 import db
 
 
-class GlacierVault:
+class GlacierClient:
     """
-    Wrapper for uploading/download archive to/from Amazon Glacier Vault
-    Makes use of shelve to store archive id corresponding to filename
-    and waiting jobs.
+    Wrapper for uploading/download archive to/from Amazon Glacier Vault.
 
-    Backup:
-    >>> GlacierVault("myvault")upload("myfile")
-
-    Restore:
-    >>> GlacierVault("myvault")retrieve("myfile")
-    or to wait until the job is ready:
-    >>> GlacierVault("myvault")retrieve("serverhealth2.py", True)
+    Parameters
+    ----------
+    VAULT_NAME : str
+    ACCESS_KEY_ID : str
+    SECRET_ACCESS_KEY : str
+    AWS_ACCOUNT_ID : str
     """
     def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID):
-        """
-        Initialize the vault
-	VAULT_NAME : str
-	ACCESS_KEY_ID : str
-	SECRET_ACCESS_KEY : str
-	AWS_ACCOUNT_ID : str
-        """
         client = boto3.client('glacier',
                               region_name='us-west-2',
                               aws_access_key_id=ACCESS_KEY_ID,
@@ -44,10 +34,16 @@ class GlacierVault:
         self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
 
     def upload(self, filename):
-        """
-        Upload filename and store the archive id for future retrieval
-
-	filename: string
+        """Upload filename and store the archive id for future retrieval
+    
+        Parameters
+        ----------
+        filename: str
+          Name of the file
+        
+        Returns
+        -------
+        boto3.Glacier.Archive
         """
 
         try:
@@ -60,9 +56,9 @@ class GlacierVault:
                 )
 
                 if response:
-		    import hashlib
+                    import hashlib
                     fileHash = hashlib.sha256(fileContent)
-		    filename = os.path.split(filename)[1] # Removes absolute path if there is one
+                    filename = os.path.split(filename)[1] # Removes absolute path if there is one
                     db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
                     return response
 
