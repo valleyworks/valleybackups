@@ -7,7 +7,12 @@ setup(
   install_requires=[
     'Click',
     'pony',
-    'boto3'
+    'boto3==1.2.6'
+  ],
+  setup_requires=[
+    'Click',
+    'pony',
+    'boto3==1.2.6'
   ],
   entry_points='''
     [console_scripts]
