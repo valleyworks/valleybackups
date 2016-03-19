@@ -4,7 +4,8 @@ from logging.handlers import RotatingFileHandler
 import requests
 import json
 import db
-from valleybackups import _get_config as get_config
+#from valleybackups import _get_config as get_config
+from config import get_config
 from extensions.GlacierVault import GlacierVault
 
 app = Flask(__name__)
