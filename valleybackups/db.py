@@ -1,4 +1,5 @@
 from pony.orm import *
+from datetime import datetime
 import os
 
 dbName = os.path.dirname(__file__) + "/database.sqlite"
@@ -11,6 +12,7 @@ class Storage(db.Entity):
     type = Required(str)
     archives = Set("Archive")
     jobs = Set("Job")
+    created_at = Optional(datetime, default=datetime.now())
 
 
 class Archive(db.Entity):
@@ -22,6 +24,8 @@ class Archive(db.Entity):
     archiveId = Required(str)
     archive_parts = Set("ArchivePart")
     jobs = Set("Job")
+    created_at = Optional(datetime, default=datetime.now())
+
 
 
 class Job(db.Entity):
@@ -31,10 +35,12 @@ class Job(db.Entity):
     storage = Required(Storage)
     status = Required(str)
     archive = Required(Archive)
+    created_at = Optional(datetime, default=datetime.now())
 
 class ArchivePart(db.Entity):
     id = PrimaryKey(int, auto=True)
     archive = Required(Archive)
+    created_at = Optional(datetime, default=datetime.now())
 
 
 def create_archive(name, vault_name, archiveId, checksum):
@@ -97,6 +103,14 @@ def get_uncompleted_jobs():
     """
     jobs = select((j.id, a.name) for j in Job for a in j.archive if j.status != "Succeeded")
     return jobs[:]
+
+@db_session
+def check_if_exists(checksum):
+    """Check if the same has been uploaded before"""
+    archive_count = count(a for a in Archive if a.checksum == checksum)
+    if archive_count > 0:
+        return True
+    return False
 
 def init_mapping():
     db.generate_mapping(create_tables=True)

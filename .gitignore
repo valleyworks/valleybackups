@@ -4,6 +4,7 @@
 *.conf
 *.txt
 *.sqlite
+*.bak
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
