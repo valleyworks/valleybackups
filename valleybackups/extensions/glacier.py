@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 import os
-import db
+from valleybackups import db
 
 
 class GlacierClient:
@@ -86,7 +86,7 @@ class GlacierClient:
         """
         Downloads a file which job has finished correctly
 
-	job_id: str
+        job_id: str
         """
         job = self.glacier.Job(self.AWS_ACCOUNT_ID, self.VAULT_NAME, job_id)
 
@@ -95,17 +95,18 @@ class GlacierClient:
 
         # Gets file name
         archive_name = output["archiveDescription"]
-	file_name = os.path.split(archive_name)[1] # Removes absolute path if there is one
+        file_name = os.path.split(archive_name)[1] # Removes absolute path if there is one
         # Reads the file content
         file_body = output["body"].read()
 
-	# Calculate hash tree
-	import hashlib
-	file_hash = hashlib.sha256(file_body)
+        # Calculate hash tree
+        import hashlib
+        file_hash = hashlib.sha256(file_body)
 
-	if file_hash.hexdigest() == job.sha256_tree_hash:
-	    print "Checksum OK"
+        if file_hash.hexdigest() == job.sha256_tree_hash:
+            print "Checksum OK"
+            print "Writing file %s" % file_name
             with open(file_name, "wb") as f:
                 f.write(file_body)
-	else:
-	    print "Checksum ERROR"
+        else:
+            print "Checksum ERROR"

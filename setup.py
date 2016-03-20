@@ -3,7 +3,8 @@ from setuptools import setup
 setup(
   name='ValleyBackups',
   version='0.1',
-  py_modules=['valleybackups'],
+  packages=['valleybackups'],
+  include_package_data=True,
   install_requires=[
     'Click',
     'pony',
@@ -16,6 +17,6 @@ setup(
   ],
   entry_points='''
     [console_scripts]
-    valleybackups=valleybackups:cli
+    valleybackups=valleybackups.cli:cli
   '''
 )
