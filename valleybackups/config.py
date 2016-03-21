@@ -27,6 +27,15 @@ else:
 
 Config.read(CONFIG_FILE)
 
+def check_config():
+  config_ok = False
+  for section_name in Config.sections():
+    for name, value in Config.items(section_name):
+        if value:
+          config_ok = True
+        else:
+          config_ok = False
+  return config_ok
 
 
 def get_config(section, option):

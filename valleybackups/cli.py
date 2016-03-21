@@ -1,9 +1,11 @@
 import os
 import click
+from click import ClickException
 import sys
-from config import get_config
-from extensions.glacier import GlacierClient
+
 from valleybackups import db
+from config import get_config, check_config
+from extensions.glacier import GlacierClient
 
 class Config(object):
     def __init__(self):
@@ -49,8 +51,14 @@ class ComplexCLI(click.MultiCommand):
               help='Enables debug mode.')
 @click.option('-s', '--service', default='Glacier')
 @pass_config
-def cli(config, debug, service):
+@click.pass_context
+def cli(context, config, debug, service):
     """A complex command line interface."""
     config.debug = debug
     config.service = service
-    db.init(get_config('glacier', 'VAULT_NAME'), debug)
+
+    if not context.invoked_subcommand.endswith('config'):
+        if check_config():
+            db.init(get_config('glacier', 'VAULT_NAME'), debug)
+        else:
+            raise click.ClickException("Invalid Configuration")

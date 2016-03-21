@@ -1,8 +1,9 @@
-import boto3
-from botocore.exceptions import ClientError
 import os
-from valleybackups import db
+import boto3
+import hashlib
+from botocore.exceptions import ClientError
 
+from valleybackups import db
 
 class GlacierClient:
     """
@@ -56,7 +57,6 @@ class GlacierClient:
                 )
 
                 if response:
-                    import hashlib
                     fileHash = hashlib.sha256(fileContent)
                     filename = os.path.split(filename)[1] # Removes absolute path if there is one
                     db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
