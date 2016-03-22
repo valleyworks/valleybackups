@@ -93,6 +93,10 @@ def get_files():
     return files
 
 @db_session
+def count_files():
+    return count(a for a in Archive)
+
+@db_session
 def get_archive_id(id):
     return Archive.get(id=id).archiveId
 
