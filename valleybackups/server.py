@@ -3,14 +3,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 import requests
 import json
-import db
-#from valleybackups import _get_config as get_config
 from config import get_config
-from extensions.GlacierVault import GlacierVault
+from extensions.glacier import GlacierClient
+from valleybackups import db
 
 app = Flask(__name__)
 
-glacier = GlacierVault(get_config('glacier','VAULT_NAME'),
+glacier = GlacierClient(get_config('glacier','VAULT_NAME'),
                        get_config('base','ACCESS_KEY_ID'),
                        get_config('base','SECRET_ACCESS_KEY'),
                        get_config('base','AWS_ACCOUNT_ID'))
@@ -56,6 +55,24 @@ def sns():
         msg_process(js['Message'], js['Timestamp'])
 
     return 'OK\n'
+
+def run_server():
+    # db.init_mapping()
+
+    handler = RotatingFileHandler('snsListener.log', maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.INFO)
+
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+
+
+    app.logger.addHandler(handler)
+
+    app.run(
+        host = "0.0.0.0",
+        # port = 5000,
+        debug = True
+    )
 
 if __name__ == '__main__':
     db.init_mapping()

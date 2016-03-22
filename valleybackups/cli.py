@@ -41,7 +41,7 @@ class ComplexCLI(click.MultiCommand):
             mod = __import__('valleybackups.commands.cmd_' + name,
                              None, None, ['cli'])
 
-        except ImportError:
+        except ImportError as e:
             return
 
         return mod.cli
