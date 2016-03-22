@@ -50,17 +50,21 @@ class GlacierClient:
         try:
             with open(filename, mode='rb') as file:  # b is important -> binary
                 fileContent = file.read()
+                try:
+                    response = self.vault.upload_archive(
+                        archiveDescription=filename,
+                        body=fileContent
+                    )
 
-                response = self.vault.upload_archive(
-                    archiveDescription=filename,
-                    body=fileContent
-                )
+                    if response:
+                        fileHash = hashlib.sha256(fileContent)
+                        filename = os.path.split(filename)[1] # Removes absolute path if there is one
+                        db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
+                        return response
 
-                if response:
-                    fileHash = hashlib.sha256(fileContent)
-                    filename = os.path.split(filename)[1] # Removes absolute path if there is one
-                    db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
-                    return response
+                except Exception, e:
+                    return False
+                
 
         except Exception as e:
             raise
