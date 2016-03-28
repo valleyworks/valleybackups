@@ -8,7 +8,7 @@ from valleybackups.config import get_parser, CONFIG_FILE
 @click.argument('vault_name', type=str)
 @pass_config
 def cli(config, vault_name):
-    """Gets a ready-to-be-downloaded file from Glacier. """
+    """Creates a new Vault in Glacier"""
     if config.service == "Glacier":
         response = config.glacier.create_vault(vault_name)
         if response:

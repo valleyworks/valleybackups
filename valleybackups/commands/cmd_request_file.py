@@ -14,7 +14,7 @@ def cli(config, archive_id):
     glacier_archive_id = db.get_archive_id(archive_id)
 
     if config.service == "Glacier":
-      try:
-          config.glacier.retrieve(glacier_archive_id)
-      except Exception as e:
-          click.echo(e)
+        try:
+            config.glacier.retrieve(glacier_archive_id)
+        except Exception as e:
+            click.echo(e)

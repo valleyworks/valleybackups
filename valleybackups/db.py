@@ -27,7 +27,6 @@ class Archive(db.Entity):
     created_at = Optional(datetime, default=datetime.now())
 
 
-
 class Job(db.Entity):
     id = PrimaryKey(int, auto=True)
     account_id = Required(str)
@@ -87,18 +86,22 @@ def update_job(job_id, status_code):
     job.status = status_code
     commit()
 
+
 @db_session
 def get_files():
     files = Archive.select()[:]
     return files
 
+
 @db_session
 def count_files():
     return count(a for a in Archive)
 
+
 @db_session
 def get_archive_id(id):
     return Archive.get(id=id).archiveId
+
 
 @db_session
 def get_uncompleted_jobs():
@@ -108,6 +111,7 @@ def get_uncompleted_jobs():
     jobs = select((j.id, a.name) for j in Job for a in j.archive if j.status != "Succeeded")
     return jobs[:]
 
+
 @db_session
 def check_if_exists(checksum):
     """Check if the same has been uploaded before"""
@@ -115,6 +119,13 @@ def check_if_exists(checksum):
     if archive_count > 0:
         return True
     return False
+
+
+@db_session
+def job_exists(job_id):
+    job_count = count(c for c in Job if c.job_id == job_id)
+    return job_count > 0
+
 
 def init_mapping():
     db.generate_mapping(create_tables=True)

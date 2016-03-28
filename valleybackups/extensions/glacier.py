@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 
 from valleybackups import db
 
+
 class GlacierClient:
     """
     Wrapper for uploading/download archive to/from Amazon Glacier Vault.
@@ -27,10 +28,10 @@ class GlacierClient:
                                 aws_access_key_id=ACCESS_KEY_ID,
                                 aws_secret_access_key=SECRET_ACCESS_KEY)
 
-        #vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
+        # vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
         self.client = client
-        #self.vault = vault
+        # self.vault = vault
         self.VAULT_NAME = VAULT_NAME
         self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
 
@@ -67,7 +68,7 @@ class GlacierClient:
 
                 except Exception, e:
                     return False
-                
+
 
         except Exception as e:
             raise
@@ -77,7 +78,7 @@ class GlacierClient:
         Initiate a Job, check its status, and download the archive
         when it's completed.
 
-	archive_id : str
+        archive_id : str
         """
 
         archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,archive_id)
@@ -86,7 +87,7 @@ class GlacierClient:
 
         job_id = job
         print "Job %s: %s ( %s / %s )" % (job.action, job.status_code, str(job.creation_date), str(job.completion_date))
-	print "Job ID: %s" % job.id
+        print "Job ID: %s" % job.id
 
     # TODO: Refactor to download file in chunks
     def download_file(self, job_id):
@@ -95,10 +96,14 @@ class GlacierClient:
 
         job_id: str
         """
+
         job = self.glacier.Job(self.AWS_ACCOUNT_ID, self.VAULT_NAME, job_id)
 
-        # Downloads the archive
-        output = job.get_output()
+        try:
+            # Downloads the archive
+            output = job.get_output()
+        except ClientError as e:
+            raise Exception(e.response["Error"]["Message"])
 
         # Gets file name
         archive_name = output["archiveDescription"]
