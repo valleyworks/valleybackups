@@ -27,12 +27,15 @@ class GlacierClient:
                                 aws_access_key_id=ACCESS_KEY_ID,
                                 aws_secret_access_key=SECRET_ACCESS_KEY)
 
-        vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
+        #vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
         self.client = client
-        self.vault = vault
+        #self.vault = vault
         self.VAULT_NAME = VAULT_NAME
         self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
+
+    def init_vault(self, AWS_ACCOUNT_ID, VAULT_NAME):
+        self.vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
     def upload(self, filename):
         """Upload filename and store the archive id for future retrieval
@@ -114,3 +117,6 @@ class GlacierClient:
                 f.write(file_body)
         else:
             print "Checksum ERROR"
+
+    def create_vault(self, vault_name):
+        return self.glacier.create_vault(vaultName=vault_name)

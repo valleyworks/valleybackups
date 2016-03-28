@@ -18,10 +18,12 @@ class Config(object):
                                 self.ACCESS_KEY_ID,
                                 self.SECRET_ACCESS_KEY,
                                 self.AWS_ACCOUNT_ID)
+        self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
 cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                           'commands'))
+
 
 class ComplexCLI(click.MultiCommand):
 
@@ -46,6 +48,7 @@ class ComplexCLI(click.MultiCommand):
 
         return mod.cli
 
+
 @click.command(cls=ComplexCLI)
 @click.option('-d', '--debug', is_flag=True,
               help='Enables debug mode.')
@@ -57,8 +60,10 @@ def cli(context, config, debug, service):
     config.debug = debug
     config.service = service
 
-    if not context.invoked_subcommand.endswith('config'):
+    if not context.invoked_subcommand.endswith('config') and not context.invoked_subcommand == 'create_vault':
         if check_config():
             db.init(get_config('glacier', 'VAULT_NAME'), debug)
         else:
+            if get_config('glacier', 'VAULT_NAME') == '':
+                raise click.ClickException("You need to specify a vault, or create one with create_vault [vault_name]")
             raise click.ClickException("Invalid Configuration")
