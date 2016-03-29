@@ -9,11 +9,10 @@ Welcome to ValleyBackups's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    
    howitworks.rst
    cli.rst
-   controllers.rst
    db.rst
    glacier.rst
 

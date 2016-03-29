@@ -1,35 +1,35 @@
+from configuration_handler import ConfigurationHandler
 from flask import Flask, request
 import logging
 from logging.handlers import RotatingFileHandler
 import requests
 import json
-from config import get_config
 from extensions.glacier import GlacierClient
 from valleybackups import db
 
 app = Flask(__name__)
 
-glacier = GlacierClient(get_config('glacier','VAULT_NAME'),
-                       get_config('base','ACCESS_KEY_ID'),
-                       get_config('base','SECRET_ACCESS_KEY'),
-                       get_config('base','AWS_ACCOUNT_ID'))
+config_handler = ConfigurationHandler()
+
+glacier = GlacierClient(config_handler.get_config('glacier', 'VAULT_NAME'),
+                        config_handler.get_config('base', 'ACCESS_KEY_ID'),
+                        config_handler.get_config('base', 'SECRET_ACCESS_KEY'),
+                        config_handler.get_config('base', 'AWS_ACCOUNT_ID'))
+
 
 def msg_process(msg, tstamp):
     js = json.loads(msg)
-    # msg = 'Region: {0} / Alarm: {1}'.format(
-    #    js['Region'], js['AlarmName']
-    # )
 
-    archiveId = js["ArchiveId"]
-    jobId = js["JobId"]
+    job_id = js["JobId"]
 
-    app.logger.info("Processing job: %s with status: %s" % (jobId, js["StatusCode"])) 
+    app.logger.info("Processing job: %s with status: %s" % (job_id, js["StatusCode"]))
     # Updates job status
-    db.update_job(jobId, js["StatusCode"])
+    db.update_job(job_id, js["StatusCode"])
 
     if js["StatusCode"] == "Succeeded":
-        app.logger.info("Downloading File... | Job: %s" % jobId)
-        glacier.download_file(jobId)
+        app.logger.info("Downloading File... | Job: %s" % job_id)
+        glacier.download_file(job_id)
+
 
 @app.route('/', methods = ['GET', 'POST', 'PUT'])
 def sns():
@@ -38,7 +38,6 @@ def sns():
         js = json.loads(request.data)
     except:
         pass
-
 
     hdr = request.headers.get('X-Amz-Sns-Message-Type')
     # subscribe to the SNS topic
@@ -50,11 +49,11 @@ def sns():
         if subscription:
             app.logger.info("Subscription Confirmed Correctly!")
 
-
     if hdr == 'Notification':
         msg_process(js['Message'], js['Timestamp'])
 
     return 'OK\n'
+
 
 def run_server():
     # db.init_mapping()
@@ -64,7 +63,6 @@ def run_server():
 
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
-
 
     app.logger.addHandler(handler)
 

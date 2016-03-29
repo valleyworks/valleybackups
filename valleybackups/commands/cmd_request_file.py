@@ -2,6 +2,7 @@ import click
 from valleybackups import db
 from valleybackups.cli import pass_config
 
+
 @click.command()
 @click.argument('archive_id', type=int)
 @pass_config

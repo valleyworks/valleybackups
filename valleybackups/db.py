@@ -36,6 +36,7 @@ class Job(db.Entity):
     archive = Required(Archive)
     created_at = Optional(datetime, default=datetime.now())
 
+
 class ArchivePart(db.Entity):
     id = PrimaryKey(int, auto=True)
     archive = Required(Archive)
@@ -86,6 +87,10 @@ def update_job(job_id, status_code):
     job.status = status_code
     commit()
 
+@db_session
+def create_vault(vault_name, type):
+    Storage(name=vault_name, type=type)
+    commit()
 
 @db_session
 def get_files():
@@ -132,8 +137,6 @@ def init_mapping():
     
 
 def init(vault_name, debug):
-    vault_name = vault_name
-
     if debug:
         sql_debug(True)
 
@@ -141,5 +144,4 @@ def init(vault_name, debug):
 
     with db_session:
         if count(s for s in Storage if s.name == vault_name) is 0:
-            Storage(name=vault_name, type="Glacier")
-            commit()
+            create_vault(vault_name, 'Glacier')

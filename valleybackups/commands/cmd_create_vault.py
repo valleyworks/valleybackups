@@ -1,7 +1,7 @@
 import click
 
-from valleybackups.cli import pass_config
-from valleybackups.config import get_parser, CONFIG_FILE
+from valleybackups.configuration_handler import pass_config
+from valleybackups import db
 
 
 @click.command()
@@ -13,9 +13,7 @@ def cli(config, vault_name):
         response = config.glacier.create_vault(vault_name)
         if response:
             click.echo("Vault %s successfully created" % vault_name)
-            parser = get_parser()
-            parser.set('glacier', 'VAULT_NAME', vault_name)
-
-            opened_file = open(CONFIG_FILE, 'w')
-            parser.write(opened_file)
-            opened_file.close()
+            config.handler.set_config('glacier', 'VAULT_NAME', vault_name)
+            config.handler.save_config()
+            db.init_mapping()
+            db.create_vault(vault_name, "Glacier")

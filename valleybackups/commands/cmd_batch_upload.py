@@ -2,8 +2,7 @@ from os import listdir
 from os.path import isfile, join
 import click
 from valleybackups import db
-from valleybackups.config import get_parser
-from valleybackups.cli import pass_config
+from valleybackups.configuration_handler import pass_config
 import hashlib
 
 @click.command()

@@ -1,31 +1,16 @@
 import os
 import click
-from click import ClickException
 import sys
 
 from valleybackups import db
-from config import get_config, check_config
-from extensions.glacier import GlacierClient
+# from config import check_config
+from configuration_handler import pass_config
 
-class Config(object):
-    def __init__(self):
-        self.debug = False
-        self.ACCESS_KEY_ID = get_config('base', 'ACCESS_KEY_ID')
-        self.SECRET_ACCESS_KEY = get_config('base', 'SECRET_ACCESS_KEY')
-        self.VAULT_NAME = get_config('glacier', 'VAULT_NAME')
-        self.AWS_ACCOUNT_ID = get_config('base', 'AWS_ACCOUNT_ID')
-        self.glacier = GlacierClient(self.VAULT_NAME,
-                                self.ACCESS_KEY_ID,
-                                self.SECRET_ACCESS_KEY,
-                                self.AWS_ACCOUNT_ID)
-        self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
-
-pass_config = click.make_pass_decorator(Config, ensure=True)
 cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                           'commands'))
 
 
-class ComplexCLI(click.MultiCommand):
+class ValleybackupsCLI(click.MultiCommand):
 
     def list_commands(self, ctx):
         rv = []
@@ -43,13 +28,13 @@ class ComplexCLI(click.MultiCommand):
             mod = __import__('valleybackups.commands.cmd_' + name,
                              None, None, ['cli'])
 
-        except ImportError as e:
+        except ImportError:
             return
 
         return mod.cli
 
 
-@click.command(cls=ComplexCLI)
+@click.command(cls=ValleybackupsCLI)
 @click.option('-d', '--debug', is_flag=True,
               help='Enables debug mode.')
 @click.option('-s', '--service', default='Glacier')
@@ -61,9 +46,9 @@ def cli(context, config, debug, service):
     config.service = service
 
     if not context.invoked_subcommand.endswith('config') and not context.invoked_subcommand == 'create_vault':
-        if check_config():
-            db.init(get_config('glacier', 'VAULT_NAME'), debug)
+        if config.handler.check_config():
+            db.init(config.VAULT_NAME, debug)
         else:
-            if get_config('glacier', 'VAULT_NAME') == '':
+            if config.VAULT_NAME == '':
                 raise click.ClickException("You need to specify a vault, or create one with create_vault [vault_name]")
             raise click.ClickException("Invalid Configuration")

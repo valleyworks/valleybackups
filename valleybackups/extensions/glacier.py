@@ -2,7 +2,6 @@ import os
 import boto3
 import hashlib
 from botocore.exceptions import ClientError
-
 from valleybackups import db
 
 
@@ -36,6 +35,7 @@ class GlacierClient:
         self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
 
     def init_vault(self, AWS_ACCOUNT_ID, VAULT_NAME):
+        """Initiates the Vault"""
         self.vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
     def upload(self, filename):
@@ -124,4 +124,7 @@ class GlacierClient:
             print "Checksum ERROR"
 
     def create_vault(self, vault_name):
+        """
+            Creates a Vault
+        """
         return self.glacier.create_vault(vaultName=vault_name)

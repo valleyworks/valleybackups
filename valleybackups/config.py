@@ -1,6 +1,9 @@
 import ConfigParser
 import os
 
+Config = ConfigParser.SafeConfigParser()
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'valleybackups.conf')
+
 def create_config_file(CONFIG_FILE):
     parser = ConfigParser.SafeConfigParser()
 
@@ -16,9 +19,6 @@ def create_config_file(CONFIG_FILE):
     parser.write(opened_file)
     opened_file.close()
 
-Config = ConfigParser.SafeConfigParser()
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'valleybackups.conf')
-
 if os.path.isfile(CONFIG_FILE):
     pass
 else:
@@ -26,6 +26,15 @@ else:
 
 
 Config.read(CONFIG_FILE)
+
+
+def get_config(section, option):
+    return Config.get(section, option)
+
+
+
+
+
 
 
 def check_config():
@@ -39,8 +48,6 @@ def check_config():
     return config_ok
 
 
-def get_config(section, option):
-  return Config.get(section, option)
 
 def get_parser():
   return Config

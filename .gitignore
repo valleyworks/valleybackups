@@ -92,3 +92,4 @@ pyvenv.cfg
 pip-selfcheck.json
 
 nohup.out
+.idea

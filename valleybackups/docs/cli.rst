@@ -1,7 +1,7 @@
 CLI App
 =======
 
-.. automodule:: valleybackups
+.. automodule:: valleybackups.commands.cmd_backup_file
     :members:
     :undoc-members:
     :show-inheritance:
