@@ -12,12 +12,14 @@ setup(
   install_requires=[
     'Click',
     'pony',
-    'boto3==1.2.6'
+    'boto3==1.2.6',
+    'flask'
   ],
   setup_requires=[
     'Click',
     'pony',
-    'boto3==1.2.6'
+    'boto3==1.2.6',
+    'flask'
   ],
   entry_points='''
     [console_scripts]
