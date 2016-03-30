@@ -13,7 +13,7 @@ Contents:
 Installation
 ------------
 
-* From the project's root folder run ``pip install --editable`` to install the package and its dependencies.
+* From the project's root folder run ``pip install --editable .`` to install the package and its dependencies.
 
 * The app will be available with the command ``valleybackups``
 
