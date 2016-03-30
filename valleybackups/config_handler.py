@@ -10,7 +10,7 @@ class ConfigurationHandler:
         if isfile(self.config_file):
             pass
         else:
-            self.create_config_file(self.config_file)
+            self.create_config_file()
 
         self.config_parser.read(self.config_file)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ValleyBackups documentation build configuration file, created by
+# ValleyBackups documentation  configuration file, created by
 # sphinx-quickstart on Fri Mar 18 12:56:58 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -22,7 +22,7 @@ import sphinx_bootstrap_theme
 #sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
-sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('../valleybackups'))
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
 
@@ -134,6 +134,7 @@ html_theme_options = {
     # an arbitrary url.
     'navbar_links': [
         ("Our Site", "http://www.valleyworks.us", True),
+        # ("API", "api")
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
@@ -242,7 +243,7 @@ html_static_path = ['_static']
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True
