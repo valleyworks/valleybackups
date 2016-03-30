@@ -1,8 +1,8 @@
 from pony.orm import *
 from datetime import datetime
-import os
+from os.path import dirname
 
-dbName = os.path.dirname(__file__) + "/database.sqlite"
+dbName = dirname(__file__) + "/database.sqlite"
 db = Database("sqlite", dbName, create_db=True)
 
 
@@ -43,17 +43,17 @@ class ArchivePart(db.Entity):
     created_at = Optional(datetime, default=datetime.now())
 
 
+@db_session
 def create_archive(name, vault_name, archiveId, checksum):
-    with db_session:
-        storage = Storage.get(name=vault_name)
-        Archive(
-            name=name,
-            storage=storage,
-            location=" ",
-            checksum=checksum,
-            archiveId=archiveId)
-        commit()
-    # archive = Archive(storage=self.storage)
+    storage = Storage.get(name=vault_name)
+    Archive(
+        name=name,
+        storage=storage,
+        location=" ",
+        checksum=checksum,
+        archiveId=archiveId)
+    commit()
+
 
 @db_session
 def create_job(account_id, vault_name, job_id, status_code, archive_id):
@@ -65,32 +65,34 @@ def create_job(account_id, vault_name, job_id, status_code, archive_id):
 	status_code : str
 	archive_id : str
     """
-    with db_session:
-        storage = Storage.get(name=vault_name)
-	archive = Archive.get(archiveId=archive_id)
-        Job(
-            account_id=account_id,
-            storage=storage,
-            job_id=job_id,
-            status=status_code,
-	    archive=archive
-	)
-        commit()
+    storage = Storage.get(name=vault_name)
+    archive = Archive.get(archiveId=archive_id)
+    Job(
+        account_id=account_id,
+        storage=storage,
+        job_id=job_id,
+        status=status_code,
+        archive=archive
+    )
+    commit()
+
 
 @db_session
 def update_job(job_id, status_code):
     """Updates job status
-	job_id : str
-	status_code : str
+    job_id : str
+    status_code : str
     """
     job = Job.get(job_id=job_id)
     job.status = status_code
     commit()
 
+
 @db_session
-def create_vault(vault_name, type):
-    Storage(name=vault_name, type=type)
+def create_vault(vault_name, storage_type):
+    Storage(name=vault_name, type=storage_type)
     commit()
+
 
 @db_session
 def get_files():
@@ -104,8 +106,8 @@ def count_files():
 
 
 @db_session
-def get_archive_id(id):
-    return Archive.get(id=id).archiveId
+def get_archive_id(archive_id):
+    return Archive.get(id=archive_id).archiveId
 
 
 @db_session
@@ -136,8 +138,8 @@ def init_mapping():
     db.generate_mapping(create_tables=True)
     
 
-def init(vault_name, debug):
-    if debug:
+def init(vault_name, debug_mode):
+    if debug_mode:
         sql_debug(True)
 
     init_mapping()

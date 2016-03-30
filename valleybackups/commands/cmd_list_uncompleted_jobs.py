@@ -2,6 +2,7 @@ import click
 
 from valleybackups import db
 
+
 @click.command()
 def cli():
     """Outputs uncompleted jobs to the console

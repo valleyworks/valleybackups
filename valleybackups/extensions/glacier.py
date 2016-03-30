@@ -67,8 +67,7 @@ class GlacierClient:
                         return response
 
                 except Exception, e:
-                    return False
-
+                    raise Exception(e.response["Error"]["Message"])
 
         except Exception as e:
             raise

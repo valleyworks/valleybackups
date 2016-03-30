@@ -1,6 +1,6 @@
 import click
 from valleybackups import db
-from valleybackups.cli import pass_config
+from valleybackups.config_context import pass_config
 
 
 @click.command()

@@ -1,9 +1,10 @@
 from os import listdir
-from os.path import isfile, join
+from os.path import join
 import click
 from valleybackups import db
-from valleybackups.configuration_handler import pass_config
+from valleybackups.config_context import pass_config
 import hashlib
+
 
 @click.command()
 @click.option('-f', '--force', is_flag=True)

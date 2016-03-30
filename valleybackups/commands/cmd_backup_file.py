@@ -1,8 +1,9 @@
 import os
 import click
 from valleybackups import db
-from valleybackups.configuration_handler import pass_config
+from valleybackups.config_context import pass_config
 import hashlib
+
 
 @click.command()
 @click.option('-f', '--force', is_flag=True)
@@ -11,16 +12,17 @@ import hashlib
 def cli(config, force, file):
     """Store a file in a AWS Glacier Vault
     """
-    filename = os.path.split(file.name)[1] # Removes absolute path if there is one
+    filename = os.path.split(file.name)[1]   # Removes absolute path if there is one
     click.echo("Uploading file %s" % filename)
     
     if db.check_if_exists(hashlib.sha256(file.read()).hexdigest()) and force is False:
-      click.echo("This file is already backed up.")      
+        click.echo("This file is already backed up.")
     else:
-      if config.service == "Glacier":
-        response = config.glacier.upload(file.name)
-
-        if response:
-            click.echo("File %s uploaded." % filename)
-        else:
+        try:
+            if config.service == "Glacier":
+                config.glacier.upload(file.name)
+                click.echo("File %s uploaded." % filename)
+        except Exception as e:
             click.echo("Error uploading file")
+            click.echo(e.message)
+

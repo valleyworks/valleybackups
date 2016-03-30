@@ -8,7 +8,7 @@ setup(
     'valleybackups.db',
     'valleybackups.server'
   ],
-  include_package_data=True,
+  # include_package_data=True,
   install_requires=[
     'Click',
     'pony',

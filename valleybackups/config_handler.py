@@ -1,42 +1,18 @@
-from extensions.glacier import GlacierClient
-import click
 import ConfigParser
-import os
+from os.path import join, dirname, isfile
 
 
-
-
-class ConfigContext(object):
-    def __init__(self):
-        self.debug = False
-        self.handler = ConfigurationHandler()
-        self.VAULT_NAME = self.handler.get_config('glacier', 'VAULT_NAME')
-        self.ACCESS_KEY_ID = self.handler.get_config('base', 'ACCESS_KEY_ID')
-        self.SECRET_ACCESS_KEY = self.handler.get_config('base', 'SECRET_ACCESS_KEY')
-        self.AWS_ACCOUNT_ID = self.handler.get_config('base', 'AWS_ACCOUNT_ID')
-
-        self.glacier = GlacierClient(self.VAULT_NAME,
-                                     self.ACCESS_KEY_ID,
-                                     self.SECRET_ACCESS_KEY,
-                                     self.AWS_ACCOUNT_ID)
-
-        self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
-
-pass_config = click.make_pass_decorator(ConfigContext, ensure=True)
-
-
-class ConfigurationHandler():
+class ConfigurationHandler:
     def __init__(self):
         self.config_parser = ConfigParser.SafeConfigParser()
-        self.config_file = os.path.join(os.path.dirname(__file__), 'valleybackups.conf')
+        self.config_file = join(dirname(__file__), 'valleybackups.conf')
 
-        if os.path.isfile(self.config_file):
+        if isfile(self.config_file):
             pass
         else:
             self.create_config_file(self.config_file)
 
         self.config_parser.read(self.config_file)
-
 
     def create_config_file(self):
         self.config_parser.add_section('base')
@@ -47,9 +23,7 @@ class ConfigurationHandler():
         self.config_parser.add_section('glacier')
         self.config_parser.set('glacier', 'VAULT_NAME', '')
 
-        opened_file = open(self.config_file, 'w')
-        self.config_parser.write(opened_file)
-        opened_file.close()
+        self.save_config()
 
     def get_config(self, section, option):
         return self.config_parser.get(section, option)

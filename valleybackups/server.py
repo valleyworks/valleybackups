@@ -1,11 +1,11 @@
-from configuration_handler import ConfigurationHandler
+from config_handler import ConfigurationHandler
 from flask import Flask, request
-import logging
 from logging.handlers import RotatingFileHandler
-import requests
-import json
 from extensions.glacier import GlacierClient
 from valleybackups import db
+import requests
+import json
+import logging
 
 app = Flask(__name__)
 
@@ -31,13 +31,10 @@ def msg_process(msg, tstamp):
         glacier.download_file(job_id)
 
 
-@app.route('/', methods = ['GET', 'POST', 'PUT'])
+@app.route('/', methods=['GET', 'POST', 'PUT'])
 def sns():
-    # AWS sends JSON with text/plain mimetype
-    try:
-        js = json.loads(request.data)
-    except:
-        pass
+    """AWS sends JSON with text/plain mimetype"""
+    js = json.loads(request.data)
 
     hdr = request.headers.get('X-Amz-Sns-Message-Type')
     # subscribe to the SNS topic
@@ -67,9 +64,9 @@ def run_server():
     app.logger.addHandler(handler)
 
     app.run(
-        host = "0.0.0.0",
+        host="0.0.0.0",
         # port = 5000,
-        debug = True
+        debug=True
     )
 
 if __name__ == '__main__':
@@ -81,11 +78,9 @@ if __name__ == '__main__':
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
 
-
     app.logger.addHandler(handler)
 
     app.run(
-        host = "0.0.0.0",
-        # port = 5000,
-        debug = True
+        host="0.0.0.0",
+        debug=True
     )

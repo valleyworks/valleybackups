@@ -1,20 +1,19 @@
-import os
+from os.path import abspath, join, dirname
+from os import listdir
 import click
-import sys
+from sys import version_info
+from valleybackups.config_context import pass_config
+from valleybackups.db import init
 
-from valleybackups import db
-# from config import check_config
-from configuration_handler import pass_config
 
-cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                          'commands'))
+cmd_folder = abspath(join(dirname(__file__), 'commands'))
 
 
 class ValleybackupsCLI(click.MultiCommand):
 
     def list_commands(self, ctx):
         rv = []
-        for filename in os.listdir(cmd_folder):
+        for filename in listdir(cmd_folder):
             if filename.endswith('.py') and \
                filename.startswith('cmd_'):
                 rv.append(filename[4:-3])
@@ -23,20 +22,19 @@ class ValleybackupsCLI(click.MultiCommand):
 
     def get_command(self, ctx, name):
         try:
-            if sys.version_info[0] == 2:
+            if version_info[0] == 2:
                 name = name.encode('ascii', 'replace')
             mod = __import__('valleybackups.commands.cmd_' + name,
                              None, None, ['cli'])
 
-        except ImportError:
+        except ImportError as e:
             return
 
         return mod.cli
 
 
 @click.command(cls=ValleybackupsCLI)
-@click.option('-d', '--debug', is_flag=True,
-              help='Enables debug mode.')
+@click.option('-d', '--debug', is_flag=True, help='Enables debug mode.')
 @click.option('-s', '--service', default='Glacier')
 @pass_config
 @click.pass_context
@@ -47,7 +45,7 @@ def cli(context, config, debug, service):
 
     if not context.invoked_subcommand.endswith('config') and not context.invoked_subcommand == 'create_vault':
         if config.handler.check_config():
-            db.init(config.VAULT_NAME, debug)
+            init(config.VAULT_NAME, debug)
         else:
             if config.VAULT_NAME == '':
                 raise click.ClickException("You need to specify a vault, or create one with create_vault [vault_name]")

@@ -1,7 +1,8 @@
 import click
 
-from valleybackups.cli import pass_config
+from valleybackups.config_context import pass_config
 from valleybackups.db import job_exists
+
 
 @click.command()
 @click.argument('job_id', type=str)
