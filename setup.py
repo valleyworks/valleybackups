@@ -8,18 +8,18 @@ setup(
     'valleybackups.db',
     'valleybackups.server'
   ],
-  # include_package_data=True,
+  include_package_data=True,
   install_requires=[
     'Click',
     'pony',
     'boto3==1.2.6',
-    'flask'
+    'Flask'
   ],
   setup_requires=[
     'Click',
     'pony',
     'boto3==1.2.6',
-    'flask'
+    'Flask'
   ],
   entry_points='''
     [console_scripts]
