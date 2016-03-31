@@ -1,4 +1,4 @@
-from extensions.glacier import GlacierClient
+from valleybackups.extensions.glacier import GlacierClient
 import click
 from valleybackups.config_handler import ConfigurationHandler
 
