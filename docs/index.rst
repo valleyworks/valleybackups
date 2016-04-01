@@ -23,7 +23,7 @@ Configuration
 * Setting configuration values: ``valleybackups set_config <section> <setting> <value``, for ex: ``valleybackups set_config glacier vault_name glacier_backups_1``
 
 Setting up your AWS account
-...........................
+---------------------------
 
 **ACCOUNT ID**
 
@@ -43,6 +43,20 @@ Creating a Glacier Vault
 ........................
 
 * Run ``valleybackups create_vault <vault_name>`` (this process creates a SNS topic and assigns it to the recently created vault, to enable Notifications)
+
+
+Create Notification Subscriptions for our Vault
+...............................................
+
+When we want to download any file stored in our Vault, we will need to configure a Subscription (basically telling AWS where to notify our app that the file is ready)
+
+* Head to the SNS service on your AWS Console
+
+* In **Topics** choose your recently created Topic (the name is <vault_name>Notification)
+
+* Click on **Create Subscription**
+
+* Follow instructions on http://docs.aws.amazon.com/sns/latest/dg/SubscribeTopic.html
 
 
 Available Commands
