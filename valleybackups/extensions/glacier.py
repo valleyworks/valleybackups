@@ -138,9 +138,6 @@ class GlacierClient:
                              aws_secret_access_key=self.SECRET_ACCESS_KEY)
         topic = sns.create_topic(Name='%sNotification' % vault_name)
 
-        import pdb;pdb.set_trace()
-
-
         response = notification.set(
             vaultNotificationConfig={
                 'SNSTopic': topic.arn,
@@ -150,3 +147,5 @@ class GlacierClient:
                 ]
             }
         )
+
+        return True
