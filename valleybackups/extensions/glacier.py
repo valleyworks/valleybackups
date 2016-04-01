@@ -16,14 +16,14 @@ class GlacierClient:
     SECRET_ACCESS_KEY : str
     AWS_ACCOUNT_ID : str
     """
-    def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID):
+    def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID, REGION):
         client = boto3.client('glacier',
-                              region_name='us-west-2',
+                              region_name=REGION,
                               aws_access_key_id=ACCESS_KEY_ID,
                               aws_secret_access_key=SECRET_ACCESS_KEY)
 
         self.glacier = boto3.resource('glacier',
-                                region_name='us-west-2',
+                                region_name=REGION,
                                 aws_access_key_id=ACCESS_KEY_ID,
                                 aws_secret_access_key=SECRET_ACCESS_KEY)
 
@@ -33,6 +33,9 @@ class GlacierClient:
         # self.vault = vault
         self.VAULT_NAME = VAULT_NAME
         self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
+        self.REGION = REGION
+        self.ACCESS_KEY_ID = ACCESS_KEY_ID
+        self.SECRET_ACCESS_KEY = SECRET_ACCESS_KEY
 
     def init_vault(self, AWS_ACCOUNT_ID, VAULT_NAME):
         """Initiates the Vault"""
@@ -126,4 +129,24 @@ class GlacierClient:
         """
             Creates a Vault
         """
-        return self.glacier.create_vault(vaultName=vault_name)
+        new_vault = self.glacier.create_vault(vaultName=vault_name)
+        notification = self.glacier.Notification(self.AWS_ACCOUNT_ID, vault_name)
+
+        sns = boto3.resource('sns',
+                             region_name=self.REGION,
+                             aws_access_key_id=self.ACCESS_KEY_ID,
+                             aws_secret_access_key=self.SECRET_ACCESS_KEY)
+        topic = sns.create_topic(Name='%sNotification' % vault_name)
+
+        import pdb;pdb.set_trace()
+
+
+        response = notification.set(
+            vaultNotificationConfig={
+                'SNSTopic': topic.arn,
+                'Events': [
+                    'ArchiveRetrievalCompleted',
+                    'InventoryRetrievalCompleted',
+                ]
+            }
+        )

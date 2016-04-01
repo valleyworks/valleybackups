@@ -15,7 +15,8 @@ class ConfigContext(object):
         self.glacier = GlacierClient(self.VAULT_NAME,
                                      self.ACCESS_KEY_ID,
                                      self.SECRET_ACCESS_KEY,
-                                     self.AWS_ACCOUNT_ID)
+                                     self.AWS_ACCOUNT_ID,
+                                     'us-west-2')
 
         self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
 
