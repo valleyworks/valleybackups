@@ -13,9 +13,7 @@ Contents:
 Installation
 ------------
 
-* From the project's root folder run ``pip install --editable .`` to install the package and its dependencies.
-
-* The app will be available with the command ``valleybackups``
+* Run ``pip install valleybackups``.
 
 Configuration
 -------------
@@ -24,12 +22,34 @@ Configuration
 
 * Setting configuration values: ``valleybackups set_config <section> <setting> <value``, for ex: ``valleybackups set_config glacier vault_name glacier_backups_1``
 
+Setting up your AWS account
+...........................
+
+**ACCOUNT ID**
+
+* Login to your AWS Console and go to "My Account" (https://console.aws.amazon.com/billing/home#/account) and take note of your **Account ID**
+
+**REGION NAME**
+
+* Navigate to the Glacier service and take note of the current Region (easiest way is to look your current URL, for ex: https://us-west-2.console.aws.amazon.com, **Region** would be *us-west-2*
+
+**ACCESS KEYS**
+
+* Navigate to the IAM service -> Users -> *Create new User*
+
+* Take note of the credentials shown
+
+Creating a Glacier Vault
+........................
+
+* Run ``valleybackups create_vault <vault_name>`` (this process creates a SNS topic and assigns it to the recently created vault, to enable Notifications)
+
 
 Available Commands
------
+------------------
 
 Boot-up server (for sns notifications)
-.....................................
+......................................
 
 This server listens to SNS notifications, and triggers file downloads when a requested file is ready.
 
