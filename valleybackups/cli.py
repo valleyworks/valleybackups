@@ -44,9 +44,12 @@ def cli(context, config, debug, service):
     config.service = service
 
     if not context.invoked_subcommand.endswith('config') and not context.invoked_subcommand == 'create_vault':
-        if config.handler.check_config():
-            init(config.VAULT_NAME, debug)
-        else:
-            if config.VAULT_NAME == '':
-                raise click.ClickException("You need to specify a vault, or create one with create_vault [vault_name]")
-            raise click.ClickException("Invalid Configuration")
+        try:
+            if config.handler.check_config():
+                init(config.VAULT_NAME, debug)
+            else:
+                if config.VAULT_NAME == '':
+                    raise click.ClickException("You need to specify a vault, or create one with create_vault [vault_name]")
+                raise click.ClickException("Invalid Configuration")
+        except Exception as e:
+            raise click.ClickException(e.message)

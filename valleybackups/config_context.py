@@ -13,12 +13,14 @@ class ConfigContext(object):
         self.AWS_ACCOUNT_ID = self.handler.get_config('base', 'AWS_ACCOUNT_ID')
         self.REGION_NAME = self.handler.get_config('base', 'REGION_NAME')
 
-        self.glacier = GlacierClient(self.VAULT_NAME,
-                                     self.ACCESS_KEY_ID,
-                                     self.SECRET_ACCESS_KEY,
-                                     self.AWS_ACCOUNT_ID,
-                                     self.REGION_NAME)
+        if self.REGION_NAME != '' and self.AWS_ACCOUNT_ID != '' and self.ACCESS_KEY_ID != '' and self.SECRET_ACCESS_KEY != '':
 
-        self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
+            self.glacier = GlacierClient(self.VAULT_NAME,
+                                         self.ACCESS_KEY_ID,
+                                         self.SECRET_ACCESS_KEY,
+                                         self.AWS_ACCOUNT_ID,
+                                         self.REGION_NAME)
+
+            self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
 
 pass_config = click.make_pass_decorator(ConfigContext, ensure=True)

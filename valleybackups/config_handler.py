@@ -19,7 +19,7 @@ class ConfigurationHandler:
         self.config_parser.set('base', 'ACCESS_KEY_ID', '')
         self.config_parser.set('base', 'SECRET_ACCESS_KEY', '')
         self.config_parser.set('base', 'AWS_ACCOUNT_ID', '')
-        self.config_parser.set('base', 'REGION_NAME')
+        self.config_parser.set('base', 'REGION_NAME', '')
 
         self.config_parser.add_section('glacier')
         self.config_parser.set('glacier', 'VAULT_NAME', '')
