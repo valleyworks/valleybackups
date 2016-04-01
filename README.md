@@ -7,7 +7,7 @@ A Backup tool with AWS Glacier support
 
 ## Usage
 
-See docs on <put doc hosting here>
+See docs on [http://pythonhosted.org/valleybackups/](http://pythonhosted.org/valleybackups/)
 
 ## Compile docs
 

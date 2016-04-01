@@ -2,8 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='valleybackups',
-    version='0.1.1',
-    description='Command-Line Based Backup Software',
+    version='0.1.2',
+    description='Command-Line based backup software '
+                'for peace of mind',
+    long_description_markdown_filename='README.md',
     url='https://github.com/valleyworks/valleybackups',
     author='ValleyWorks',
     author_email='nahuel.chaves@valleyworks.us',
