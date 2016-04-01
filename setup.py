@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='valleybackups',
-    version='0.1',
+    version='0.1.1',
     description='Command-Line Based Backup Software',
     url='https://github.com/valleyworks/valleybackups',
     author='ValleyWorks',
