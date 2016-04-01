@@ -11,12 +11,13 @@ class ConfigContext(object):
         self.ACCESS_KEY_ID = self.handler.get_config('base', 'ACCESS_KEY_ID')
         self.SECRET_ACCESS_KEY = self.handler.get_config('base', 'SECRET_ACCESS_KEY')
         self.AWS_ACCOUNT_ID = self.handler.get_config('base', 'AWS_ACCOUNT_ID')
+        self.REGION_NAME = self.handler.get_config('base', 'REGION_NAME')
 
         self.glacier = GlacierClient(self.VAULT_NAME,
                                      self.ACCESS_KEY_ID,
                                      self.SECRET_ACCESS_KEY,
                                      self.AWS_ACCOUNT_ID,
-                                     'us-west-2')
+                                     self.REGION_NAME)
 
         self.glacier.init_vault(self.AWS_ACCOUNT_ID, self.VAULT_NAME)
 

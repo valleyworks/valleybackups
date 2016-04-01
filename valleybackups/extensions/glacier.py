@@ -16,16 +16,16 @@ class GlacierClient:
     SECRET_ACCESS_KEY : str
     AWS_ACCOUNT_ID : str
     """
-    def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID, REGION):
+    def __init__(self, VAULT_NAME, ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_ACCOUNT_ID, REGION_NAME):
         client = boto3.client('glacier',
-                              region_name=REGION,
+                              region_name=REGION_NAME,
                               aws_access_key_id=ACCESS_KEY_ID,
                               aws_secret_access_key=SECRET_ACCESS_KEY)
 
         self.glacier = boto3.resource('glacier',
-                                region_name=REGION,
-                                aws_access_key_id=ACCESS_KEY_ID,
-                                aws_secret_access_key=SECRET_ACCESS_KEY)
+                                      region_name=REGION_NAME,
+                                      aws_access_key_id=ACCESS_KEY_ID,
+                                      aws_secret_access_key=SECRET_ACCESS_KEY)
 
         # vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
@@ -33,7 +33,7 @@ class GlacierClient:
         # self.vault = vault
         self.VAULT_NAME = VAULT_NAME
         self.AWS_ACCOUNT_ID = AWS_ACCOUNT_ID
-        self.REGION = REGION
+        self.REGION_NAME = REGION_NAME
         self.ACCESS_KEY_ID = ACCESS_KEY_ID
         self.SECRET_ACCESS_KEY = SECRET_ACCESS_KEY
 
@@ -133,7 +133,7 @@ class GlacierClient:
         notification = self.glacier.Notification(self.AWS_ACCOUNT_ID, vault_name)
 
         sns = boto3.resource('sns',
-                             region_name=self.REGION,
+                             region_name=self.REGION_NAME,
                              aws_access_key_id=self.ACCESS_KEY_ID,
                              aws_secret_access_key=self.SECRET_ACCESS_KEY)
         topic = sns.create_topic(Name='%sNotification' % vault_name)
