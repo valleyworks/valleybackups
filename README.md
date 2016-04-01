@@ -1,5 +1,5 @@
 # glacierbackups
-A Backup tool with AWS Glacier support
+Command-line based backup tool integrated with AWS Glacier
 
 ## Installation
 

@@ -9,6 +9,7 @@ Contents:
     howitworks
     api/index
 
+Command-line based backup tool integrated with AWS Glacier
 
 Installation
 ------------
