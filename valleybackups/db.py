@@ -25,6 +25,7 @@ class Archive(db.Entity):
     archive_parts = Set("ArchivePart")
     jobs = Set("Job")
     created_at = Optional(datetime, default=datetime.now())
+    size = Optional(str)
 
 
 class Job(db.Entity):
@@ -44,14 +45,16 @@ class ArchivePart(db.Entity):
 
 
 @db_session
-def create_archive(name, vault_name, archiveId, checksum):
+def create_archive(name, vault_name, archiveId, checksum, file_size):
     storage = Storage.get(name=vault_name)
     Archive(
         name=name,
         storage=storage,
         location=" ",
         checksum=checksum,
-        archiveId=archiveId)
+        archiveId=archiveId,
+        size=file_size
+    )
     commit()
 
 

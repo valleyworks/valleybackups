@@ -66,7 +66,7 @@ class GlacierClient:
                     if response:
                         fileHash = hashlib.sha256(fileContent)
                         filename = os.path.split(filename)[1] # Removes absolute path if there is one
-                        db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest())
+                        db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest(), file.tell().__str__())
                         return response
 
                 except Exception, e:
