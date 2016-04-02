@@ -9,13 +9,17 @@ import logging
 
 app = Flask(__name__)
 
-config_handler = ConfigurationHandler()
+try:
+    config_handler = ConfigurationHandler()
 
-glacier = GlacierClient(config_handler.get_config('glacier', 'VAULT_NAME'),
-                        config_handler.get_config('base', 'ACCESS_KEY_ID'),
-                        config_handler.get_config('base', 'SECRET_ACCESS_KEY'),
-                        config_handler.get_config('base', 'AWS_ACCOUNT_ID'))
-
+    glacier = GlacierClient(config_handler.get_config('glacier', 'VAULT_NAME'),
+                            config_handler.get_config('base', 'ACCESS_KEY_ID'),
+                            config_handler.get_config('base', 'SECRET_ACCESS_KEY'),
+                            config_handler.get_config('base', 'AWS_ACCOUNT_ID'),
+                            config_handler.get_config('base', 'REGION_NAME'))
+except Exception as e:
+    print "Invalid Configuration"
+    exit()
 
 def msg_process(msg, tstamp):
     js = json.loads(msg)
