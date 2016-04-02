@@ -33,13 +33,24 @@ class ValleybackupsCLI(click.MultiCommand):
         return mod.cli
 
 
-@click.command(cls=ValleybackupsCLI)
+@click.command(cls=ValleybackupsCLI, invoke_without_command=True)
 @click.option('-d', '--debug', is_flag=True, help='Enables debug mode.')
 @click.option('-s', '--service', default='Glacier')
+@click.option('-v', '--version', is_flag=True)
 @pass_config
 @click.pass_context
-def cli(context, config, debug, service):
+def cli(context, config, debug, service, version):
     """A complex command line interface."""
+
+    if version:
+        from valleybackups.__init__ import version
+        click.echo(version)
+        exit()
+
+    if context.invoked_subcommand is None:
+        click.echo(context.get_help())
+        exit()
+
     config.debug = debug
     config.service = service
 

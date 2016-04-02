@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+from valleybackups.__init__ import version
+
 setup(
     name='valleybackups',
-    version='0.1.5',
+    version=version,
     description='Command-line based backup tool integrated with AWS Glacier',
     long_description_markdown_filename='README.md',
     url='https://github.com/valleyworks/valleybackups',

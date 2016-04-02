@@ -3,9 +3,16 @@ from os.path import join, dirname, isfile
 
 
 class ConfigurationHandler:
-    def __init__(self):
+    def __init__(self, config_name="valleybackups.conf"):
+        self.valid_config = [
+            "ACCESS_KEY_ID",
+            "SECRET_ACCESS_KEY",
+            "AWS_ACCOUNT_ID",
+            "REGION_NAME",
+            "VAULT_NAME"
+        ]
         self.config_parser = ConfigParser.SafeConfigParser()
-        self.config_file = join(dirname(__file__), 'valleybackups.conf')
+        self.config_file = join(dirname(__file__), config_name)
 
         if isfile(self.config_file):
             pass
@@ -30,6 +37,8 @@ class ConfigurationHandler:
         return self.config_parser.get(section, option)
 
     def set_config(self, section, option, value):
+        if option.upper() not in self.valid_config:
+            raise Exception("Please enter a valid setting name")
         self.config_parser.set(section, option, value)
 
     def check_config(self):
