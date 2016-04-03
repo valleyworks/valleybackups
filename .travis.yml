@@ -12,3 +12,6 @@ install:
 
 script:
   python valleybackups/test.py
+
+notifications:
+  slack: valleyworks:YFa1nRXNSi6ukVKAlHT8zgcU
