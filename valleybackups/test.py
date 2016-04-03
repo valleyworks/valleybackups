@@ -1,7 +1,7 @@
 import unittest
 from valleybackups.config_handler import ConfigurationHandler
 import os
-
+import sys
 
 class ValleybackupsTest(unittest.TestCase):
 
@@ -16,10 +16,12 @@ class ValleybackupsTest(unittest.TestCase):
     def test_set_valid_config(self):
         self.config.set_config('base', 'aws_account_id', '123123123')
 
-
     def test_set_invalid_config(self):
-        with self.assertRaises(Exception):
-            self.config.set_config('base', 'invalid_config', '123123123')
+        if sys.version_info[:2] == (2,6):
+            self.assertRaises(Exception, self.config.set_config('base', 'invalid_config', '123123123'))
+        else:
+            with self.assertRaises(Exception):
+                self.config.set_config('base', 'invalid_config', '123123123')
 
     def tearDown(self):
         os.remove(os.path.join(os.path.dirname(__file__), "test.conf"))
