@@ -11,6 +11,7 @@ def cli(config, section, setting, value):
     """Sets value to a specific configuration item"""
     click.echo("Changing option %s.%s to %s" % (section, setting, value))
 
-    config.handler.set_config(section, setting, value)
-
-    config.handler.save_config()
+    if config.handler.set_config(section, setting, value):
+        config.handler.save_config()
+    else:
+        raise click.ClickException("Please enter a valid setting name")

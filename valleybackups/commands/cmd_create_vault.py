@@ -13,7 +13,7 @@ def cli(config, vault_name):
         response = config.glacier.create_vault(vault_name)
         if response:
             click.echo("Vault %s successfully created" % vault_name)
-            config.handler.set_config('glacier', 'VAULT_NAME', vault_name)
-            config.handler.save_config()
-            db.init_mapping()
-            db.create_vault(vault_name, "Glacier")
+            if config.handler.set_config('glacier', 'VAULT_NAME', vault_name):
+                config.handler.save_config()
+                db.init_mapping()
+                db.create_vault(vault_name, "Glacier")

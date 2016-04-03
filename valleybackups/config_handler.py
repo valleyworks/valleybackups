@@ -38,8 +38,9 @@ class ConfigurationHandler:
 
     def set_config(self, section, option, value):
         if option.upper() not in self.valid_config:
-            raise Exception("Please enter a valid setting name")
+            return False
         self.config_parser.set(section, option, value)
+        return True
 
     def check_config(self):
         config_ok = False
