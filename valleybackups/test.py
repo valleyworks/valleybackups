@@ -1,5 +1,5 @@
 import unittest
-import config_handler
+from valleybackups.config_handler import ConfigurationHandler
 import os
 
 class ValleybackupsTest(unittest.TestCase):
@@ -9,7 +9,7 @@ class ValleybackupsTest(unittest.TestCase):
 
     def test_open_config_file(self):
         """Test filesystem access to configuration file"""
-        config = config_handler.ConfigurationHandler("test.conf")
+        config = ConfigurationHandler("test.conf")
         os.remove(os.path.join(os.path.dirname(__file__), "test.conf"))
         self.assertTrue(config)
 
