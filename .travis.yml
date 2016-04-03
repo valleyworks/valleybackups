@@ -9,3 +9,6 @@ python:
 
 install:
   - pip install --editable .
+
+script:
+  python valleybackups/test.py
