@@ -1,9 +1,30 @@
 from pony.orm import *
 from datetime import datetime
 from os.path import dirname
+from valleybackups.util import get_platform
+import os, stat
+platform = get_platform()
 
-dbName = dirname(__file__) + "/database.sqlite"
-db = Database("sqlite", dbName, create_db=True)
+if platform == "linux":
+  directory = "/usr/local/etc/valleybackups"
+  dbName = os.path.join(directory, "database.sqlite")
+  try:
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+      db = Database("sqlite", dbName, create_db=True)
+
+      # Makes folder and db world-writable
+      os.chmod(directory, stat.S_IRWXO)
+      os.chmod(dbName, stat.S_IRWXO)
+    else:
+      db = Database("sqlite", dbName)
+
+  except OSError:
+    print "Permission denied: first run needs sudo permissions"
+    exit()
+else:
+  dbName = dirname(__file__) + "/database.sqlite"
+  db = Database("sqlite", dbName, create_db=True)
 
 
 class Storage(db.Entity):
@@ -139,7 +160,7 @@ def job_exists(job_id):
 
 def init_mapping():
     db.generate_mapping(create_tables=True)
-    
+
 
 def init(vault_name, debug_mode):
     if debug_mode:
