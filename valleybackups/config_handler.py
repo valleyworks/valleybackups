@@ -1,5 +1,9 @@
 import ConfigParser
+from os import chmod
 from os.path import join, dirname, isfile
+import stat
+from valleybackups.util import get_platform
+platform = get_platform()
 
 
 class ConfigurationHandler:
@@ -12,7 +16,12 @@ class ConfigurationHandler:
             "VAULT_NAME"
         ]
         self.config_parser = ConfigParser.SafeConfigParser()
-        self.config_file = join(dirname(__file__), config_name)
+
+        if platform in ("linux","osx"):
+          directory = "/usr/local/etc/valleybackups"
+          self.config_file = join(directory, config_name)
+        else:
+          self.config_file = join(dirname(__file__), config_name)
 
         if isfile(self.config_file):
             pass
@@ -31,7 +40,7 @@ class ConfigurationHandler:
         self.config_parser.add_section('glacier')
         self.config_parser.set('glacier', 'VAULT_NAME', '')
 
-        self.save_config()
+        self.save_config(change_permissions=True)
 
     def get_config(self, section, option):
         return self.config_parser.get(section, option)
@@ -55,7 +64,9 @@ class ConfigurationHandler:
     def get_parser(self):
         return self.config_parser
 
-    def save_config(self):
+    def save_config(self, change_permissions=False):
         opened_file = open(self.config_file, 'w')
         self.config_parser.write(opened_file)
         opened_file.close()
+        if change_permissions:
+          chmod(self.config_file, int('777', 8))

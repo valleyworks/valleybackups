@@ -5,7 +5,7 @@ from valleybackups.util import get_platform
 import os, stat
 platform = get_platform()
 
-if platform == "linux":
+if platform in ("linux","osx"):
   directory = "/usr/local/etc/valleybackups"
   dbName = os.path.join(directory, "database.sqlite")
   try:
@@ -14,8 +14,8 @@ if platform == "linux":
       db = Database("sqlite", dbName, create_db=True)
 
       # Makes folder and db world-writable
-      os.chmod(directory, stat.S_IRWXO)
-      os.chmod(dbName, stat.S_IRWXO)
+      os.chmod(directory, int('777', 8))
+      os.chmod(dbName, int('777', 8))
     else:
       db = Database("sqlite", dbName)
 
