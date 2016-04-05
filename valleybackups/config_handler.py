@@ -1,6 +1,6 @@
 import ConfigParser
-from os import chmod
-from os.path import join, dirname, isfile
+from os import chmod, makedirs
+from os.path import join, dirname, isfile, exists
 import stat
 from valleybackups.util import get_platform
 platform = get_platform()
@@ -19,6 +19,10 @@ class ConfigurationHandler:
 
         if platform in ("linux","osx"):
           directory = "/usr/local/etc/valleybackups"
+          if not exists(directory):
+            makedirs(directory)
+            chmod(directory, int('777', 8))
+
           self.config_file = join(directory, config_name)
         else:
           self.config_file = join(dirname(__file__), config_name)
