@@ -1,7 +1,7 @@
 from sys import platform as _platform
 
 def get_platform():
-  if _platform == "linux" or _platform == "linux2":
+  if _platform.startswith('linux'):
       return "linux"
   elif _platform == "darwin":
       return "osx"
