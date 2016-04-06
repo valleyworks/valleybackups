@@ -158,6 +158,12 @@ def job_exists(job_id):
     return job_count > 0
 
 
+@db_session
+def get_job(id):
+    job = Job.get(id=id)
+    return job
+
+
 def init_mapping():
     db.generate_mapping(create_tables=True)
 

@@ -1,7 +1,7 @@
 import click
 
 from valleybackups.config_context import pass_config
-from valleybackups.db import job_exists
+from valleybackups.db import job_exists, get_job
 
 
 @click.command()
@@ -10,9 +10,10 @@ from valleybackups.db import job_exists
 def cli(config, job_id):
     """Gets a ready-to-be-downloaded file from Glacier. """
     if config.service == "Glacier":
-        if not job_exists(job_id):
+        job = get_job(job_id)
+        if not job_exists(job.job_id):
             raise click.ClickException(message="This file has not been uploaded from this machine")
     try:
-        response = config.glacier.download_file(job_id)
+        response = config.glacier.download_file(job.job_id)
     except Exception as e:
         raise click.ClickException(e.message)
