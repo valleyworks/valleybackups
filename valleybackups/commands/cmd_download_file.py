@@ -11,6 +11,9 @@ def cli(config, job_id):
     """Gets a ready-to-be-downloaded file from Glacier. """
     if config.service == "Glacier":
         job = get_job(job_id)
+        if not job:
+            raise click.ClickException(message="The requested file does not exist in our database, "
+                                               "please check with list_uncompleted_jobs command")
         if not job_exists(job.job_id):
             raise click.ClickException(message="This file has not been uploaded from this machine")
     try:

@@ -3,7 +3,7 @@ import click
 from valleybackups import db
 from valleybackups.config_context import pass_config
 import hashlib
-
+from os.path import isfile
 
 @click.command()
 @click.option('-f', '--force', is_flag=True)
@@ -12,6 +12,7 @@ import hashlib
 def cli(config, force, file):
     """Store a file in a AWS Glacier Vault
     """
+    import pdb; pdb.set_trace()
     filename = os.path.split(file.name)[1]   # Removes absolute path if there is one
     click.echo("Uploading file %s" % filename)
     

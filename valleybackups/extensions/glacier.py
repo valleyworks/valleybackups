@@ -84,7 +84,13 @@ class GlacierClient:
         """
 
         archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,archive_id)
-        job = archive.initiate_archive_retrieval()
+        try:
+            job = archive.initiate_archive_retrieval()
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "PolicyEnforcedException":
+                raise Exception("You have exceeded your Free Tier request size")
+            raise Exception(e.response["Error"]["Code"])
+
         db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code,archive_id)
 
         job_id = job
@@ -105,8 +111,9 @@ class GlacierClient:
             # Downloads the archive
             output = job.get_output()
         except ClientError as e:
-            raise Exception(e.response["Error"]["Message"])
-
+            if e.response["Error"]["Code"] == "PolicyEnforcedException":
+                raise Exception("You have exceeded your Free Tier request size")
+            raise Exception(e.response["Error"]["Code"])
         # Gets file name
         archive_name = output["archiveDescription"]
         file_name = os.path.split(archive_name)[1] # Removes absolute path if there is one
