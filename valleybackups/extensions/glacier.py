@@ -94,8 +94,7 @@ class GlacierClient:
         db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code,archive_id)
 
         job_id = job
-        print "Job %s: %s ( %s / %s )" % (job.action, job.status_code, str(job.creation_date), str(job.completion_date))
-        print "Job ID: %s" % job.id
+        return job.id
 
     # TODO: Refactor to download file in chunks
     def download_file(self, job_id):
@@ -113,7 +112,7 @@ class GlacierClient:
         except ClientError as e:
             if e.response["Error"]["Code"] == "PolicyEnforcedException":
                 raise Exception("You have exceeded your Free Tier request size")
-            raise Exception(e.response["Error"]["Code"])
+            raise Exception(e.response["Error"]["Message"])
         # Gets file name
         archive_name = output["archiveDescription"]
         file_name = os.path.split(archive_name)[1] # Removes absolute path if there is one

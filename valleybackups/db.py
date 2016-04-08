@@ -142,11 +142,13 @@ def get_uncompleted_jobs():
     jobs = select((j.id, a.name) for j in Job for a in j.archive if j.status != "Succeeded")
     return jobs[:]
 
+
 @db_session
 def check_dup_requested_file(archive_id):
 
     jobs = count(j for j in Job if j.archive.id == archive_id)
     return jobs > 0
+
 
 @db_session
 def check_if_exists(checksum):
@@ -166,6 +168,12 @@ def job_exists(job_id):
 @db_session
 def get_job(id):
     job = Job.get(id=id)
+    return job
+
+
+@db_session
+def get_job_for_archive(archive_id):
+    job = get(j for j in Job if j.archive.id == int(archive_id))
     return job
 
 
