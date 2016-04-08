@@ -10,12 +10,19 @@ def cli(config, archive_id):
     """Requests a backup from Glacier
     """
 
-    click.echo("Retrieving %s" % archive_id)
+    # TODO: don't request a already requested file
 
-    glacier_archive_id = db.get_archive_id(archive_id)
+    exist = db.check_dup_requested_file(archive_id)
 
-    if config.service == "Glacier":
-        try:
-            config.glacier.retrieve(glacier_archive_id)
-        except Exception as e:
-            click.echo(e)
+    if not exist:
+        click.echo("Retrieving %s" % archive_id)
+
+        glacier_archive_id = db.get_archive_id(archive_id)
+
+        if config.service == "Glacier":
+            try:
+                config.glacier.retrieve(glacier_archive_id)
+            except Exception as e:
+                click.echo(e)
+    else:
+        raise click.ClickException(message="This file has been already requested")

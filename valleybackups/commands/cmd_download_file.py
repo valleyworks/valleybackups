@@ -9,6 +9,8 @@ from valleybackups.db import job_exists, get_job
 @pass_config
 def cli(config, job_id):
     """Gets a ready-to-be-downloaded file from Glacier. """
+
+    # TODO: Download file by Archive ID instead of Job ID
     if config.service == "Glacier":
         job = get_job(job_id)
         if not job:
