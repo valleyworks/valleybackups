@@ -16,12 +16,62 @@ Installation
 
 * Run ``pip install valleybackups``.
 
-Configuration
--------------
+AWS Glacier set up
+------------------
 
-* Check current configuration: ``valleybackups check_config``
+Create access_key and secret_access_key in AWS Console
+......................................................
 
-* Setting configuration values: ``valleybackups set_config <section> <setting> <value``, for ex: ``valleybackups set_config glacier vault_name glacier_backups_1``
+* Go to https://console.aws.amazon.com/iam/
+* Create a new user valleybackups
+* Then click on show user credentials
+* Download the credentials
+
+Get the AWS account id:
+.......................
+
+* Go to https://console.aws.amazon.com/billing/home?#/account
+* Copy the account id
+
+Get the AWS region:
+...................
+
+* Go to Management Console and get the region string from the url, example: https://us-west-2.console.aws.amazon.com/ec2/v2/home?region=us-west-2
+
+Set permissions in AWS
+......................
+
+* Go to IAM users https://console.aws.amazon.com/iam/home?region=us-west-2#users
+* Go to the user created (valleybackups)
+* Click on Permissions
+* Click on Attach Policy
+* Look for Glacier and SNS
+* Click on AmazonGlacierFullAccess and then AmazonSNSFullAccess
+* Click on Attach Policy
+
+Create a Glacier Vault:
+.......................
+
+* Go to https://us-west-2.console.aws.amazon.com/glacier/home?region=us-west-2#/initial-start and click on Get Started
+* Choose a name and click next, for example **"mybackups"**
+* Choose Enable notifications and create a new SNS topic
+* Choose a Topic Name: **mybackupsnotification**
+* Check both Archive Retrieval and Vault Inventory options
+* Click Next then Submit
+
+Set the configuration in ValleyBackups
+......................................
+
+* ``valleybackups set_config base access_key_id *<access_key>*``
+* ``valleybackups set_config base secret_access_key *<secret_access_key>*``
+* ``valleybackups set_config base aws_account_id *<account_id>*``
+* ``valleybackups set_config base region_name *us-west-2*``
+* ``valleybackups set_config glacier vault_name *mybackups*``
+
+Verify config:
+..............
+
+* valleybackups get_config
 
 Setting up your AWS account
 ---------------------------
@@ -60,15 +110,25 @@ When we want to download any file stored in our Vault, we will need to configure
 * Follow instructions on http://docs.aws.amazon.com/sns/latest/dg/SubscribeTopic.html
 
 
+How to use it
+-------------
+
+
+Pick any file you want to backup and push it to AWS Glacier:
+    ``valleybackups backup_file <filename>``
+
+Then list all your backed up files:
+    ``valleybackups list_files``
+
+Retrieve a file from valleybackups by using the ID in the previous list:
+    ``valleybackups request_file 1``
+
+This will generate a job to retrieve the file. It will usually takes hour. Once it’s ready you can retrieve in the folder you currently are by running:
+    ``valleybackups download_file 1``
+
+
 Available Commands
 ------------------
-
-Boot-up server (for sns notifications)
-......................................
-
-This server listens to SNS notifications, and triggers file downloads when a requested file is ready.
-
-Run ``valleybackups run_sns_listener``
 
 Backup
 ......
@@ -109,3 +169,9 @@ Create Vault
 ............
 
 Run ``valleybackups create_vault <vault_name>``
+
+
+Support
+=======
+
+Need help installing ValleyBackups in your project? Who you gonna call? Call Valley Works! … or better send an email to valleybackups@valleyworks.us

@@ -5,12 +5,11 @@ from valleybackups.__init__ import version
 setup(
     name='valleybackups',
     version=version,
-    description='Command-line based backup tool integrated with AWS Glacier',
+    description='Command-line based AWS Glacier backup tool',
     long_description_markdown_filename='README.md',
-    url='https://github.com/valleyworks/valleybackups',
-    author='ValleyWorks',
-    author_email='nahuel.chaves@valleyworks.us',
-    #packages=['valleybackups'],
+    url='https://www.valleyworks.us',
+    author='Valley Works',
+    author_email='valleybackups@valleyworks.us',
     packages=find_packages(),
     license='MIT',
     classifiers=[
