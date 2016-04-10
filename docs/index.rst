@@ -174,4 +174,4 @@ Run ``valleybackups create_vault <vault_name>``
 Support
 =======
 
-Need help installing ValleyBackups in your project? Who you gonna call? Call Valley Works! … or better send an email to valleybackups@valleyworks.us
+Need help installing ValleyBackups in your project? Contact us via http://www.valleyworks.us/contact/ or email us to valleybackups@valleyworks.us.

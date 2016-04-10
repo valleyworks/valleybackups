@@ -7,7 +7,7 @@ setup(
     version=version,
     description='Command-line based AWS Glacier backup tool',
     long_description_markdown_filename='README.md',
-    url='https://www.valleyworks.us',
+    url='http://www.valleyworks.us',
     author='Valley Works',
     author_email='valleybackups@valleyworks.us',
     packages=find_packages(),
