@@ -115,16 +115,16 @@ How to use it
 
 
 Pick any file you want to backup and push it to AWS Glacier:
-    ``valleybackups backup_file <filename>``
+    ``valleybackups backup <filename>``
 
 Then list all your backed up files:
-    ``valleybackups list_files``
+    ``valleybackups list``
 
 Retrieve a file from valleybackups by using the ID in the previous list:
-    ``valleybackups request_file 1``
+    ``valleybackups request 1``
 
 This will generate a job to retrieve the file. It will usually takes hour. Once it’s ready you can retrieve in the folder you currently are by running:
-    ``valleybackups download_file 1``
+    ``valleybackups download 1``
 
 
 Available Commands
@@ -143,12 +143,12 @@ Run ``valleybackups bacth_upload <folder>``
 List Archives
 .............
 
-Run ``valleybackups list_files``
+Run ``valleybackups list``
 
 Request file
 ............
 
-Run ``valleybackups request_file <id>`` (id is listed on list_files command)
+Run ``valleybackups request <id>`` (id is listed on list_files command)
 
 List Uncompleted (Pending) Jobs
 ...............................
@@ -163,7 +163,7 @@ Run ``valleybackups check_config``
 Download File
 .............
 
-Run ``valleybackups download_file <job_id>`` (This id is returned by SNS)
+Run ``valleybackups download <job_id>`` (This id is returned by SNS)
 
 Create Vault
 ............
