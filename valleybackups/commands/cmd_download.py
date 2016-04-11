@@ -1,7 +1,8 @@
 import click
 
 from valleybackups.config_context import pass_config
-from valleybackups.db import job_exists, get_job, check_dup_requested_file, get_archive_id, get_job_for_archive
+from valleybackups.db import job_exists, get_job, check_dup_requested_file, get_archive_id, get_job_for_archive, delete_job
+from valleybackups.exceptions import JobNotFound
 
 
 @click.command()
@@ -9,9 +10,9 @@ from valleybackups.db import job_exists, get_job, check_dup_requested_file, get_
 @pass_config
 def cli(config, archive_id):
     """Gets a ready-to-be-downloaded file from Glacier. """
-    try:
-        # TODO: Download file by Archive ID instead of Job ID
-        if config.service == "Glacier":
+
+    if config.service == "Glacier":
+        try:
             glacier_archive_id = get_archive_id(archive_id)
 
             if check_dup_requested_file(archive_id):
@@ -31,5 +32,9 @@ def cli(config, archive_id):
             if not job_exists(job.job_id):
                 raise click.ClickException(message="This file has not been uploaded from this machine")
             """
-    except Exception as e:
-        raise click.ClickException(e.message)
+        except JobNotFound:
+            delete_job(job.id)
+            job_id = config.glacier.retrieve(glacier_archive_id)
+            click.echo("File has been requested for download.")
+        except Exception as e:
+            raise click.ClickException(e.message)

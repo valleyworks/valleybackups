@@ -3,6 +3,7 @@ import boto3
 import hashlib
 from botocore.exceptions import ClientError
 from valleybackups import db
+from valleybackups.exceptions import JobNotFound
 
 
 class GlacierClient:
@@ -112,7 +113,10 @@ class GlacierClient:
         except ClientError as e:
             if e.response["Error"]["Code"] == "PolicyEnforcedException":
                 raise Exception("You have exceeded your Free Tier request size")
+            elif e.response["Error"]["Code"] == "ResourceNotFoundException":
+                raise JobNotFound
             raise Exception(e.response["Error"]["Message"])
+
         # Gets file name
         archive_name = output["archiveDescription"]
         file_name = os.path.split(archive_name)[1] # Removes absolute path if there is one
@@ -133,7 +137,7 @@ class GlacierClient:
 
         with open(file_name, "wb") as f:
             f.write(file_body)
-            
+
     def create_vault(self, vault_name):
         """
             Creates a Vault

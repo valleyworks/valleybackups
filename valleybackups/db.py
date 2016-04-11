@@ -170,6 +170,10 @@ def get_job(id):
     job = Job.get(id=id)
     return job
 
+@db_session
+def delete_job(id):
+    job = Job[id].delete()
+    import pdb;pdb.set_trace()
 
 @db_session
 def get_job_for_archive(archive_id):
