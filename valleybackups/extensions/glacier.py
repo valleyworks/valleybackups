@@ -120,17 +120,20 @@ class GlacierClient:
         file_body = output["body"].read()
 
         # Calculate hash tree
-        import hashlib
-        file_hash = hashlib.sha256(file_body)
+        #import hashlib
+        #file_hash = hashlib.sha256(file_body)
 
-        if file_hash.hexdigest() == job.sha256_tree_hash:
-            print "Checksum OK"
-            print "Writing file %s" % file_name
-            with open(file_name, "wb") as f:
-                f.write(file_body)
-        else:
-            print "Checksum ERROR"
+        #if file_hash.hexdigest() == job.sha256_tree_hash:
+        #    print "Checksum OK"
+        #    print "Writing file %s" % file_name
+        #    with open(file_name, "wb") as f:
+        #        f.write(file_body)
+        #else:
+        #    print "Checksum ERROR"
 
+        with open(file_name, "wb") as f:
+            f.write(file_body)
+            
     def create_vault(self, vault_name):
         """
             Creates a Vault
