@@ -175,7 +175,7 @@ Need help installing ValleyBackups in your project? Contact us via http://www.va
 How to contribute to ValleyBackups
 ==================================
 
-We welcome rockstars and ninjas contributors like you.
+We welcome rockstars and ninja contributors like you.
 
 If you have any bug report, feature request, or any suggestion, please open a new issue on GitHub.
 
