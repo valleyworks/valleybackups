@@ -7,7 +7,7 @@ Command-line based AWS Glacier backup tool
 
 ## Usage
 
-See docs on [http://pythonhosted.org/valleybackups/](http://pythonhosted.org/valleybackups/)
+See docs on [http://valleybackups.readthedocs.org/](http://valleybackups.readthedocs.org/)
 
 ## Compile docs
 
