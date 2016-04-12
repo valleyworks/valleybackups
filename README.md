@@ -21,7 +21,7 @@ Made with brains and love by Valley Works (http://www.valleyworks.us). Support: 
 
 ## How to contribute to ValleyBackups
 
-We welcome rockstars and ninjas contributors like you.
+We welcome rockstars and ninja contributors like you.
 
 If you have any bug report, feature request, or any suggestion, please open a new issue on GitHub.
 
