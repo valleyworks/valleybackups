@@ -145,15 +145,10 @@ List Archives
 
 Run ``valleybackups list``
 
-Request file
-............
-
-Run ``valleybackups request <id>`` (id is listed on list_files command)
-
 List Uncompleted (Pending) Jobs
 ...............................
 
-Run ``valleybackups list_uncompleted_jobs``
+Run ``valleybackups uncompleted_jobs``
 
 Check Config
 ............
@@ -163,7 +158,7 @@ Run ``valleybackups check_config``
 Download File
 .............
 
-Run ``valleybackups download <job_id>`` (This id is returned by SNS)
+Run ``valleybackups download <archive_id>`` (From `list` command)
 
 Create Vault
 ............
@@ -175,3 +170,17 @@ Support
 =======
 
 Need help installing ValleyBackups in your project? Contact us via http://www.valleyworks.us/contact/ or email us to valleybackups@valleyworks.us.
+
+
+How to contribute to ValleyBackups
+==================================
+
+We welcome rockstars and ninjas contributors like you.
+
+If you have any bug report, feature request, or any suggestion, please open a new issue on GitHub.
+
+To submit hotfixes or features please create a pull request in GitHub.
+
+Repository: https://github.com/valleyworks/valleybackups
+
+Thank you!
