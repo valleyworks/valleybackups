@@ -12,7 +12,7 @@ class ConfigContext(object):
         self.SECRET_ACCESS_KEY = self.handler.get_config('base', 'SECRET_ACCESS_KEY')
         self.AWS_ACCOUNT_ID = self.handler.get_config('base', 'AWS_ACCOUNT_ID')
         self.REGION_NAME = self.handler.get_config('base', 'REGION_NAME')
-
+        self.WEBHOOK_URL = self.handler.get_config('slack', 'WEBHOOK_URL')
         if self.REGION_NAME != '' and self.AWS_ACCOUNT_ID != '' and self.ACCESS_KEY_ID != '' and self.SECRET_ACCESS_KEY != '':
 
             self.glacier = GlacierClient(self.VAULT_NAME,

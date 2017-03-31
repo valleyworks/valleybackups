@@ -54,6 +54,9 @@ def cli(context, config, debug, service, version):
     config.debug = debug
     config.service = service
 
+    if context.invoked_subcommand == 'test_slack':
+        return
+
     if not context.invoked_subcommand.endswith('config') and not context.invoked_subcommand == 'create_vault':
         try:
             if config.handler.check_config():

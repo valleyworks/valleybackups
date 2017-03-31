@@ -13,7 +13,8 @@ class ConfigurationHandler:
             "SECRET_ACCESS_KEY",
             "AWS_ACCOUNT_ID",
             "REGION_NAME",
-            "VAULT_NAME"
+            "VAULT_NAME",
+            "WEBHOOK_URL"
         ]
         self.config_parser = ConfigParser.SafeConfigParser()
 
@@ -43,6 +44,9 @@ class ConfigurationHandler:
 
         self.config_parser.add_section('glacier')
         self.config_parser.set('glacier', 'VAULT_NAME', '')
+
+        self.config_parser.add_section('slack')
+        self.config_parser.set('slack', 'WEBHOOK_URL', '')
 
         self.save_config(change_permissions=True)
 

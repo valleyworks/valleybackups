@@ -28,13 +28,15 @@ setup(
         'Click',
         'pony',
         'boto3==1.2.6',
-        'Flask'
+        'Flask',
+        'requests'
     ],
     setup_requires=[
         'Click',
         'pony',
         'boto3==1.2.6',
-        'Flask'
+        'Flask',
+        'requests'
     ],
     entry_points='''
     [console_scripts]
