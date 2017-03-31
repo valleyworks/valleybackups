@@ -20,7 +20,7 @@ def cli(config, force, file):
     else:
         try:
             if config.service == "Glacier":
-                config.glacier.upload(file.name)
+                config.glacier.upload(file.name, slack_hook_url=config.WEBHOOK_URL)
                 click.echo("File %s uploaded." % filename)
         except Exception as e:
             click.echo("Error uploading file")

@@ -1,9 +1,12 @@
 import os
 import boto3
 import hashlib
+import requests
+import json
 from botocore.exceptions import ClientError
 from valleybackups import db
 from valleybackups.exceptions import JobNotFound
+
 
 
 class GlacierClient:
@@ -42,7 +45,7 @@ class GlacierClient:
         """Initiates the Vault"""
         self.vault = self.glacier.Vault(AWS_ACCOUNT_ID, VAULT_NAME)
 
-    def upload(self, filename):
+    def upload(self, filename, slack_hook_url=None):
         """Upload filename and store the archive id for future retrieval
     
         Parameters
@@ -66,8 +69,23 @@ class GlacierClient:
 
                     if response:
                         fileHash = hashlib.sha256(fileContent)
-                        filename = os.path.split(filename)[1] # Removes absolute path if there is one
-                        db.create_archive(filename, response.vault_name, response.id, fileHash.hexdigest(), file.tell().__str__())
+                        # Removes absolute path if there is one
+                        filename = os.path.split(filename)[1]
+                        db.create_archive(filename,
+                                          response.vault_name,
+                                          response.id,
+                                          fileHash.hexdigest(),
+                                          file.tell().__str__()
+                                          )
+                        if slack_hook_url != "":
+                            payload = {
+                                "text": """
+                                Just to let you know.\nI've uploaded your {filename} to AWS Glacier.
+                                """.format(filename=filename)
+                            }
+                            r = requests.post(slack_hook_url, data = json.dumps(payload))
+                            if (r.status_code != 200):
+                                print (r.text)
                         return response
 
                 except Exception, e:
@@ -84,7 +102,7 @@ class GlacierClient:
         archive_id : str
         """
 
-        archive = self.glacier.Archive(self.AWS_ACCOUNT_ID,self.VAULT_NAME,archive_id)
+        archive = self.glacier.Archive(self.AWS_ACCOUNT_ID, self.VAULT_NAME, archive_id)
         try:
             job = archive.initiate_archive_retrieval()
         except ClientError as e:
@@ -92,7 +110,7 @@ class GlacierClient:
                 raise Exception("You have exceeded your Free Tier request size")
             raise Exception(e.response["Error"]["Code"])
 
-        db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code,archive_id)
+        db.create_job(job.account_id, self.VAULT_NAME, job.id, job.status_code, archive_id)
 
         job_id = job
         return job.id

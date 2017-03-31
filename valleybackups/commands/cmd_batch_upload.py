@@ -23,7 +23,8 @@ def cli(config, force, folder):
                     
             else:
                 if config.service == "Glacier":
-                    response = config.glacier.upload(open_file.name)
+                    response = config.glacier.upload(open_file.name,
+                                                     slack_hook_url=config.WEBHOOK_URL)
 
                 if response:
                     click.echo("File %s uploaded." % file)
