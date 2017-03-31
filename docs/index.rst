@@ -110,6 +110,12 @@ When we want to download any file stored in our Vault, we will need to configure
 * Follow instructions on http://docs.aws.amazon.com/sns/latest/dg/SubscribeTopic.html
 
 
+Slack Notifications
+-------------------
+
+* First you need to setup a slack webhook and copy the provided url
+* Then run ``valleybackups set_config slack WEBHOOK_URL <slack_webhook_url>`` 
+
 How to use it
 -------------
 
